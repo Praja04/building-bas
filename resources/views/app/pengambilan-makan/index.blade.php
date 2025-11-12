@@ -14,7 +14,7 @@
     </div>
 
     <div class="container-fluid">
-        <ul class="nav nav-tabs" id="penitipanTab" role="tablist">
+        <ul class="nav nav-tabs" id="pengambilanMakanTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="form-tab" data-bs-toggle="tab" data-bs-target="#formTab" type="button"
                     role="tab">Pengambilan Makan</button>
@@ -25,15 +25,15 @@
             </li>
         </ul>
 
-        <div class="tab-content mt-3" id="penitipanTabContent">
+        <div class="tab-content mt-3" id="pengambilanMakanTabContent">
             {{-- TAB FORM --}}
             <div class="tab-pane fade show active" id="formTab" role="tabpanel">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold">Form Penitipan Barang</h6>
+                        <h6 class="mb-0 fw-semibold">Form Pengambilan Makan</h6>
                     </div>
                     <div class="card-body">
-                        <form id="formPenitipan">
+                        <form id="formPengambilanMakan">
                             <div class="row g-3">
                                 <!-- Kolom Kiri: Foto -->
                                 <div class="col-md-4 d-flex justify-content-center align-items-center">
