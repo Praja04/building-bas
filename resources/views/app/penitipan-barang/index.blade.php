@@ -525,6 +525,10 @@
                     .reload()
             });
 
+            $('#form-tab').on('click', function() {
+                $('#cardnodevice').focus();
+            });
+
             $('#formPenitipan').submit(function(e) {
                 e.preventDefault();
 

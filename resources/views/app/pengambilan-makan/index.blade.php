@@ -335,6 +335,10 @@
                 $('#tablePengambilan').DataTable().ajax
                     .reload()
             });
+
+            $('#form-tab').on('click', function() {
+                $('#cardnodevice').focus();
+            });
         });
     </script>
 @endsection
