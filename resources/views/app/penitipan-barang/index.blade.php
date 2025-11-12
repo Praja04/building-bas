@@ -332,13 +332,21 @@
                                 $('#nama_penitip').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen);
                             } else {
-                                alert(res.message || 'Kartu tidak ditemukan!');
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Peringatan',
+                                    text: res.message || 'Kartu tidak ditemukan!'
+                                });
                                 $('#btnResetRFID').click();
                             }
                         },
                         error: function(err) {
                             console.error(err);
-                            alert('Terjadi kesalahan saat mengambil data.');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Terjadi kesalahan saat mengambil data.'
+                            });
                         },
                         complete: function() {
                             $('#cardnodevice').prop('disabled', false);
