@@ -133,6 +133,16 @@
 
 @section('script')
     <script>
+        function playSound(soundFile) {
+            try {
+                const audio = new Audio(soundFile);
+                audio.volume = 1.0;
+                audio.play().catch(err => console.log('Audio play error:', err));
+            } catch (error) {
+                console.log('Sound error:', error);
+            }
+        }
+
         $('#btnResetRFID').on('click', function() {
             $('#cardnodevice, #nik, #nama_pegawai, #departemen').val('');
             $('#fotoPegawai').attr('src', "{{ asset('assets/images/no-image.jpg') }}");
@@ -154,6 +164,8 @@
                         },
                         success: function(res) {
                             if (res.status === 'success') {
+                                playSound("{{ asset('assets/sound/success.mp3') }}");
+
                                 $('#nik').val(res.data.nik);
                                 $('#nama_pegawai').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen);
@@ -196,6 +208,7 @@
 
                             if (xhr.status === 403 && res.status === 'rejected') {
                                 // ❌ DITOLAK - Sudah ambil hari ini
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
                                 $('#nik').val(res.data.nik);
                                 $('#nama_pegawai').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen || '');
@@ -236,6 +249,7 @@
 
                             } else if (xhr.status === 404) {
                                 // ❌ Kartu tidak ditemukan
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Kartu Tidak Terdaftar',
@@ -248,6 +262,7 @@
                                     .reload()
                             } else {
                                 // ❌ Error lainnya
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
                                 console.error('Error:', xhr);
                                 Swal.fire({
                                     icon: 'error',
