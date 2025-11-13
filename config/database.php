@@ -116,6 +116,7 @@ return [
         '192.168.178.44-admin' => [
             'driver'    => 'mysql',
             'host'      => env('SMU_DB_HOST'),
+            'port'      => env('SMU_DB_PORT'),
             'database'  => env('SMU_DB_DATABASE'),
             'username'  => env('SMU_DB_USERNAME'),
             'password'  => env('SMU_DB_PASSWORD'),
