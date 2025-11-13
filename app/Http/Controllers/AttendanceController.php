@@ -7,7 +7,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
+use App\Exports\AttendanceExport;
 
 class AttendanceController extends Controller
 {
@@ -46,7 +48,6 @@ class AttendanceController extends Controller
     public function getUser($input)
     {
         try {
-
             // --- 1. CARI BERDASARKAN CARDNODEVICE ---
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
@@ -202,6 +203,23 @@ class AttendanceController extends Controller
             return response()->json([
                 'status'  => 'error',
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'attendance_' . now()->format('Ymd_His') . '.xlsx';
+            return Excel::download(new AttendanceExport, $fileName);
+        } catch (\Exception $e) {
+            Log::error('[AttendanceController export]', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal export data: ' . $e->getMessage()
             ], 500);
         }
     }

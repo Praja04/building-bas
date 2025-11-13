@@ -11,7 +11,7 @@
         <ul class="nav nav-tabs" id="penitipanTab" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="registrasi-tab" data-bs-toggle="tab" data-bs-target="#registrasiTab"
-                    type="button" role="tab">Registrasi Masuk</button>
+                    type="button" role="tab">Check In (Masuk)</button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="check-out-tab" data-bs-toggle="tab" data-bs-target="#checkOutTab"
@@ -155,8 +155,11 @@
             {{-- TAB DATA --}}
             <div class="tab-pane fade" id="dataTab" role="tabpanel">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-semibold">Data Peserta</h6>
+                        <button id="btnExportExcel" class="btn btn-success btn-sm">
+                            Export Excel
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -500,6 +503,24 @@
                     }
                 });
             });
+
+            $('#btnExportExcel').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Export Data',
+                    text: 'File Excel sedang diproses...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        window.location.href = "{{ route('attendance.export') }}";
+                    }
+                });
+                setTimeout(() => Swal.close(), 1500);
+            });
+
         });
     </script>
 @endsection

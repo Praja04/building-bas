@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AttendanceController;
 
 Route::prefix('penitipan-barang')->group(function () {
    Route::get('/', [App\Http\Controllers\PenitipanBarangController::class, 'index'])->name('penitipan-barang.index');
@@ -24,8 +23,9 @@ Route::prefix('pengambilan-makan')->group(function () {
 });
 
 Route::prefix('attendance')->group(function () {
-   Route::get('/', [AttendanceController::class, 'index'])->name('attendance.index');
-   Route::get('/user/{cardnodevice}', [AttendanceController::class, 'getUser'])->name('attendance.getByCard');
-   Route::post('/store', [AttendanceController::class, 'store'])->name('attendance.store');
-   Route::post('/checkout', [AttendanceController::class, 'checkout'])->name('attendance.checkout');
+   Route::get('/', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+   Route::get('/user/{cardnodevice}', [App\Http\Controllers\AttendanceController::class, 'getUser'])->name('attendance.getByCard');
+   Route::post('/store', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
+   Route::post('/checkout', [App\Http\Controllers\AttendanceController::class, 'checkout'])->name('attendance.checkout');
+   Route::get('/export', [App\Http\Controllers\AttendanceController::class, 'export'])->name('attendance.export');
 });
