@@ -29,13 +29,13 @@
          <!--- Sidenav Menu -->
          <ul class="side-nav">
              <li class="side-nav-title mt-2" data-lang="menu-title">Navigasi</li>
-             <li class="side-nav-item">
+             {{-- <li class="side-nav-item">
                  <a href="{{ route('penitipan-barang.index') }}"
                      class="side-nav-link {{ request()->routeIs('penitipan-barang.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="package"></i></span>
                      <span class="menu-text" data-lang="penitipan-barang">Penitipan Barang</span>
                  </a>
-             </li>
+             </li> --}}
              <li class="side-nav-item">
                  <a href="{{ route('pengambilan-makan.index') }}"
                      class="side-nav-link {{ request()->routeIs('pengambilan-makan.index') ? 'active' : '' }}">

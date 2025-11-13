@@ -177,30 +177,37 @@
                                         "{{ asset('assets/images/no-image.jpg') }}");
                                 }
 
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '✓ BERHASIL!',
-                                    html: `
-                                <div class="text-center">
-                                    <h5 class="mb-2">${res.data.nama}</h5>
-                                    <p class="text-muted mb-1">${res.data.nik}</p>
-                                    <p class="text-muted mb-3">${res.data.departemen}</p>
-                                    <div class="alert alert-success mb-0">
-                                        <i class="mdi mdi-check-circle"></i>
-                                        <strong>Pengambilan Makan Tercatat</strong><br>
-                                        <small>Tanggal: ${res.data.tanggal}</small><br>
-                                        <small>Waktu: ${res.data.waktu_ambil} WIB</small>
-                                    </div>
-                                </div>
-                            `,
+                                // Toast Success
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
                                     timer: 4000,
                                     timerProgressBar: true,
-                                    showConfirmButton: false,
-                                    allowOutsideClick: false
-                                }).then(() => {
-                                    $('#btnResetRFID').click();
+                                    didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal
+                                            .resumeTimer)
+                                    }
                                 });
 
+                                Toast.fire({
+                                    icon: 'success',
+                                    title: 'Pengambilan Makan Berhasil!',
+                                    html: `
+                                <div class="text-start">
+                                    <strong>${res.data.nama}</strong><br>
+                                    <small class="text-muted">${res.data.nik} - ${res.data.departemen}</small><br>
+                                    <small>Tanggal: ${res.data.tanggal} | Waktu: ${res.data.waktu_ambil} WIB</small>
+                                </div>
+                            `
+                                });
+
+                                // Auto reset setelah 3 detik
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 3000);
                             }
                         },
                         error: function(xhr) {
@@ -209,6 +216,7 @@
                             if (xhr.status === 403 && res.status === 'rejected') {
                                 // ❌ DITOLAK - Sudah ambil hari ini
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
+
                                 $('#nik').val(res.data.nik);
                                 $('#nama_pegawai').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen || '');
@@ -217,64 +225,88 @@
                                     $('#fotoPegawai').attr('src', res.data.foto);
                                 }
 
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: '⚠️ DITOLAK!',
-                                    html: `
-                                <div class="text-center">
-                                    <h5 class="mb-2">${res.data.nama}</h5>
-                                    <p class="text-muted mb-1">${res.data.nik}</p>
-                                    <div class="alert alert-danger mb-0">
-                                        <i class="mdi mdi-close-circle"></i>
-                                        <strong>${res.message}</strong><br>
-                                        <small>Waktu pengambilan: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
-                                    </div>
-                                    <p class="mt-3 mb-0 text-danger">
-                                        <strong>Batas pengambilan: 1x per hari</strong>
-                                    </p>
-                                </div>
-                            `,
+                                // Toast Error
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
                                     timer: 5000,
                                     timerProgressBar: true,
-                                    showConfirmButton: false,
-                                    allowOutsideClick: false,
-                                    customClass: {
-                                        popup: 'animated shake'
+                                    didOpen: (toast) => {
+                                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                                        toast.addEventListener('mouseleave', Swal
+                                            .resumeTimer)
                                     }
-                                }).then(() => {
-                                    $('#btnResetRFID').click();
-                                    $('#tablePengambilan').DataTable().ajax
-                                        .reload()
                                 });
+
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Pengambilan Ditolak!',
+                                    html: `
+                                <div class="text-start">
+                                    <strong>${res.data.nama}</strong><br>
+                                    <small class="text-muted">${res.data.nik}</small><br>
+                                    <hr class="my-1">
+                                    <small class="text-danger"><strong>${res.message}</strong></small><br>
+                                    <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
+                                    <small><strong>Batas: 1x per hari</strong></small>
+                                </div>
+                            `
+                                });
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 4000);
 
                             } else if (xhr.status === 404) {
                                 // ❌ Kartu tidak ditemukan
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
-                                Swal.fire({
+
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+
+                                Toast.fire({
                                     icon: 'error',
                                     title: 'Kartu Tidak Terdaftar',
-                                    text: res.message || 'Kartu tidak ditemukan di sistem',
-                                    timer: 3000,
-                                    showConfirmButton: false
+                                    text: res.message || 'Kartu tidak ditemukan di sistem'
                                 });
-                                $('#btnResetRFID').click();
-                                $('#tablePengambilan').DataTable().ajax
-                                    .reload()
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 2000);
+
                             } else {
                                 // ❌ Error lainnya
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
+
                                 console.error('Error:', xhr);
-                                Swal.fire({
+
+                                const Toast = Swal.mixin({
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+
+                                Toast.fire({
                                     icon: 'error',
                                     title: 'Terjadi Kesalahan',
-                                    text: res.message ||
-                                        'Terjadi kesalahan saat memproses data',
-                                    timer: 3000,
-                                    showConfirmButton: false
+                                    text: res?.message ||
+                                        'Terjadi kesalahan saat memproses data'
                                 });
-                                $('#btnResetRFID').click();
-                                $('#tablePengambilan').DataTable().ajax
-                                    .reload()
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 2000);
                             }
                         },
                         complete: function() {

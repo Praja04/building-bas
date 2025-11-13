@@ -4,7 +4,7 @@
 
    <head>
        <meta charset="utf-8">
-       <title>@yield('title') | {{ env('APP_NAME') }}</title>
+       <title>@yield('title')</title>
        <meta name="viewport" content="width=device-width, initial-scale=1">
        <meta content="{{ csrf_token() }}" name="csrf-token">
 
