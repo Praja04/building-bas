@@ -21,7 +21,9 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
      */
     public function collection()
     {
-        return Attendance::select('nik', 'nama_pegawai', 'departemen')->get();
+        return Attendance::select('nik', 'nama_pegawai', 'departemen')
+            ->where('is_doorprize', 1)
+            ->get();
     }
 
     /**

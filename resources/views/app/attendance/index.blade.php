@@ -40,7 +40,8 @@
 
                                             <div class="position-relative">
                                                 <input type="text" class="form-control" id="cardnodevice-in"
-                                                    name="cardnodevice" placeholder="Tempelkan kartu..." autofocus>
+                                                    name="cardnodevice" placeholder="Tempelkan ID card atau masukan NIK..."
+                                                    autofocus>
 
                                                 <div id="loaderRFID"
                                                     class="d-none position-absolute top-50 end-0 translate-middle-y me-2">
@@ -57,28 +58,32 @@
 
                                 </div>
 
-                                <div class="col-md-12">
-                                    <label class="form-label fw-semibold">NIK <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" name="nik" id="nik-in" required
-                                        placeholder="NIK">
-                                </div>
+                                <div class="checkInResult d-none">
+                                    <div class="row g-3">
 
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Nama Peserta <span class="text-danger">*
-                                        </span></label>
-                                    <input type="text" class="form-control" name="nama_pegawai" id="nama_pegawai-in"
-                                        required placeholder="Nama Peserta" readonly>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-semibold">Departemen <span class="text-danger">*</span>
-                                    </label>
-                                    <input type="text" class="form-control" name="departemen" id="departemen-in" required
-                                        placeholder="Departemen" readonly>
-                                </div>
-                            </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold">NIK <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="nik" id="nik-in"
+                                                required placeholder="NIK">
+                                        </div>
 
-                            <div class="mt-4 d-flex justify-content-end gap-2">
-                                <button type="submit" class="btn btn-primary" id="saveRegistrasi">Simpan</button>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Nama Peserta <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="nama_pegawai"
+                                                id="nama_pegawai-in" required placeholder="Nama Peserta" readonly>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Departemen <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="departemen" id="departemen-in"
+                                                required placeholder="Departemen" readonly>
+                                        </div>
+
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -101,7 +106,8 @@
 
                                             <div class="position-relative">
                                                 <input type="text" class="form-control" id="cardnodevice-out"
-                                                    name="cardnodevice" placeholder="Tempelkan kartu..." autofocus>
+                                                    name="cardnodevice"
+                                                    placeholder="Tempelkan ID card atau masukan NIK..." autofocus>
 
                                                 <div id="loaderRFID-out"
                                                     class="d-none position-absolute top-50 end-0 translate-middle-y me-2">
@@ -119,69 +125,69 @@
 
                                 </div>
 
-                                <div class="attendanceResult">
-                                    <div class="col-md-12">
-                                        <label class="form-label fw-semibold">NIK <span
-                                                class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="nik" id="nik-out"
-                                            required placeholder="NIK">
-                                    </div>
-                                    <div class="row mt-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold">Nama Peserta <span class="text-danger">*
-                                                </span></label>
-                                            <input type="text" class="form-control" name="nama_pegawai"
-                                                id="nama_pegawai-out" required placeholder="Nama Peserta" readonly>
+                                <div class="checkOutResult d-none">
+                                    <div class="row g-3">
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold">NIK <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" name="nik" id="nik-out"
+                                                required placeholder="NIK">
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold">Departemen <span
-                                                    class="text-danger">*</span>
-                                            </label>
-                                            <input type="text" class="form-control" name="departemen"
-                                                id="departemen-out" required placeholder="Departemen" readonly>
+                                        <div class="row mt-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Nama Peserta <span
+                                                        class="text-danger">*
+                                                    </span></label>
+                                                <input type="text" class="form-control" name="nama_pegawai"
+                                                    id="nama_pegawai-out" required placeholder="Nama Peserta" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold">Departemen <span
+                                                        class="text-danger">*</span>
+                                                </label>
+                                                <input type="text" class="form-control" name="departemen"
+                                                    id="departemen-out" required placeholder="Departemen" readonly>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="mt-4 d-flex justify-content-end gap-2">
-                                <button type="submit" class="btn btn-primary" id="saveCheckOut">Simpan</button>
-                            </div>
-                        </form>
                     </div>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            {{-- TAB DATA --}}
-            <div class="tab-pane fade" id="dataTab" role="tabpanel">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 fw-semibold">Data Peserta</h6>
-                        <button id="btnExportExcel" class="btn btn-success btn-sm">
-                            Export Excel
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle" id="tableAttendance">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="5%">#</th>
-                                        <th>NIK</th>
-                                        <th>Nama Peserta</th>
-                                        <th>Departemen</th>
-                                        <th>Jam Masuk</th>
-                                        <th>Jam Pulang</th>
-                                        <th>Status Doorprize</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
+        {{-- TAB DATA --}}
+        <div class="tab-pane fade" id="dataTab" role="tabpanel">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-semibold">Data Peserta</h6>
+                    <button id="btnExportExcel" class="btn btn-success btn-sm">
+                        Export Excel
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle" id="tableAttendance">
+                            <thead class="table-light">
+                                <tr>
+                                    <th width="5%">#</th>
+                                    <th>NIK</th>
+                                    <th>Nama Peserta</th>
+                                    <th>Departemen</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Pulang</th>
+                                    <th>Status Doorprize</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 
@@ -202,46 +208,80 @@
                             $('#loaderRFID').removeClass('d-none');
                         },
                         success: function(res) {
-                            console.log(res);
-                            if (res.status === 'success') {
-                                $('#nik-in').val(res.data.nik);
-                                $('#nama_pegawai-in').val(res.data.nama);
-                                $('#departemen-in').val(res.data.departemen);
-                            } else {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Gagal',
-                                    text: res.message,
-                                });
-                                $('#btnResetRFID').click();
-                                return;
-                            }
+                            // store data
+                            $('.checkInResult').removeClass('d-none');
+                            $('#nik-in').val(res.data.nik);
+                            $('#nama_pegawai-in').val(res.data.nama);
+                            $('#departemen-in').val(res.data.departemen);
+
+                            $.ajax({
+                                url: "{{ route('attendance.store') }}",
+                                type: "POST",
+                                data: {
+                                    nik: res.data.nik,
+                                    nama_pegawai: res.data.nama,
+                                    departemen: res.data.departemen,
+                                    cardnodevice: cardValue,
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    // success store
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil!',
+                                        html: `
+                                                <div class="text-start">
+                                                    <strong>${response.data.nama_pegawai}</strong><br>
+                                                    <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
+                                                    <small>Jam Masuk: ${response.data.jam_masuk_formatted} WIB</small>
+                                                </div>
+                                            `
+                                    })
+                                    $('#btnResetRFID').click();
+                                },
+                                error: function(xhr) {
+                                    // error store
+                                    console.error("error store: ", xhr.responseJSON);
+                                    if (xhr.status === 403) {
+                                        Toast.fire({
+                                            icon: 'warning',
+                                            title: 'Sudah Terdaftar!',
+                                            text: 'Peserta sudah melakukan registrasi sebelumnya'
+
+                                        });
+                                    } else {
+                                        Toast.fire({
+                                            icon: 'error',
+                                            title: 'Gagal!',
+                                            text: 'Terjadi kesalahan dalam menyimpan data'
+                                        })
+                                    }
+                                    $('#btnResetRFID').click();
+                                }
+                            });
                         },
                         error: function(xhr) {
-                            let response = xhr.responseJSON;
+                            console.error("error getUser: ", xhr.responseJSON);
 
-                            if (xhr.status === 403) {
-                                Swal.fire({
+                            if (xhr.status === 404) {
+                                Toast.fire({
                                     icon: 'warning',
-                                    title: 'Sudah Terdaftar',
-                                    text: response.message,
-                                });
-                                $('#btnResetRFID').click();
-                                return;
+                                    title: 'Tidak Ditemukan!',
+                                    text: 'Karyawan tidak terdaftar dalam sistem'
+                                })
                             } else {
-                                console.error(response);
-                                Swal.fire({
+                                Toast.fire({
                                     icon: 'error',
-                                    title: 'Error',
-                                    text: 'Terjadi kesalahan saat scan ID Card. Silakan coba lagi.',
-                                });
-                                $('#btnResetRFID').click();
-                                return;
+                                    title: 'Gagal!',
+                                    text: 'Terjadi kesalahan dalam scan ID card'
+                                })
                             }
+                            $('#btnResetRFID').click();
                         },
                         complete: function() {
                             $('#cardnodevice-in').prop('disabled', false);
                             $('#loaderRFID').addClass('d-none');
+
                         }
                     });
                 }
@@ -263,47 +303,78 @@
                             $('#loaderRFID-out').removeClass('d-none');
                         },
                         success: function(res) {
-                            if (res.status === 'success') {
-                                $('#nik-out').val(res.data.nik);
-                                $('#nama_pegawai-out').val(res.data.nama);
-                                $('#departemen-out').val(res.data.departemen);
-                            } else {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Gagal',
-                                    text: res.message,
-                                });
-                                $('#btnResetRFID-out').click();
-                            }
+                            // ajax checkout
+                            $('.checkOutResult').removeClass('d-none');
+                            $('#nik-out').val(res.data.nik);
+
+                            $.ajax({
+                                // checkout data
+                                url: "{{ route('attendance.checkout') }}",
+                                type: "POST",
+                                data: {
+                                    nik: res.data.nik,
+                                    _token: $('meta[name="csrf-token"]').attr('content')
+                                },
+                                success: function(response) {
+                                    // success checkout
+                                    Toast.fire({
+                                        icon: 'success',
+                                        title: 'Berhasil Checkout!',
+                                        html: `
+                                                <div class="text-start">
+                                                    <strong>${response.data.nama_pegawai}</strong><br>
+                                                    <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
+                                                    <small>Jam Keluar: ${response.data.jam_keluar_formatted} WIB</small>
+                                                </div>
+                                            `
+                                    })
+                                    $('#btnResetRFID-out').click();
+                                },
+                                error: function(xhr) {
+                                    console.error("error checkout: ", xhr.responseJSON);
+
+                                    if (xhr.status === 403) {
+                                        Toast.fire({
+                                            icon: 'warning',
+                                            title: 'Sudah Keluar!',
+                                            text: 'Peserta sudah melakukan checkout sebelumnya'
+                                        });
+                                    } else if (xhr.status === 404) {
+                                        Toast.fire({
+                                            icon: 'warning',
+                                            title: 'Tidak Ditemukan!',
+                                            text: 'Peserta belum melakukan registrasi/masuk'
+                                        });
+                                    } else {
+                                        Toast.fire({
+                                            icon: 'error',
+                                            title: 'Error!',
+                                            text: 'Terjadi kesalahan saat proses checkout'
+                                        });
+                                    }
+                                    $('#btnResetRFID-out').click();
+                                }
+                            });
+
                         },
                         error: function(xhr) {
-                            let response = xhr.responseJSON;
-                            console.error(response);
-                            if (xhr.status === 403) {
-                                Swal.fire({
+                            // error scan id card
+                            console.error("error getUser: ", xhr.responseJSON);
+
+                            if (xhr.status === 404) {
+                                Toast.fire({
                                     icon: 'warning',
-                                    title: 'Sudah Terdaftar',
-                                    text: response.message,
-                                });
-                                $('#btnResetRFID-out').click();
-                                return;
-                            } else if (xhr.status === 404) {
-                                Swal.fire({
-                                    icon: 'warning',
-                                    title: 'Tidak Ditemukan',
-                                    text: response.message,
-                                });
-                                $('#btnResetRFID-out').click();
-                                return;
+                                    title: 'Tidak Ditemukan!',
+                                    text: 'Karyawan tidak terdaftar dalam sistem'
+                                })
                             } else {
-                                console.error(response);
-                                Swal.fire({
+                                Toast.fire({
                                     icon: 'error',
-                                    title: 'Error',
-                                    text: 'Terjadi kesalahan saat scan ID Card. Silakan coba lagi.',
-                                });
-                                $('#btnResetRFID-out').click();
+                                    title: 'Gagal!',
+                                    text: 'Terjadi kesalahan dalam scan ID card'
+                                })
                             }
+                            $('#btnResetRFID-out').click();
                         },
                         complete: function() {
                             $('#cardnodevice-out').prop('disabled', false);
@@ -316,13 +387,28 @@
 
         $('#btnResetRFID').on('click', function() {
             $('#cardnodevice-in, #nik-in, #nama_pegawai-in, #departemen-in').val('');
-            $('#cardnodevice-in').focus();
+            $('.checkInResult').addClass('d-none');
+            setTimeout(() => {
+                $('#cardnodevice-in').focus();
+            }, 100);
         });
 
         $('#btnResetRFID-out').on('click', function() {
             $('#cardnodevice-out, #nik-out, #nama_pegawai-out, #departemen-out').val('');
-            $('#cardnodevice-out').focus();
+            $('.checkOutResult').addClass('d-none');
+            setTimeout(() => {
+                $('#cardnodevice-out').focus();
+            }, 100);
         });
+
+        $('button[data-bs-target="#registrasiTab"]').on('shown.bs.tab', function() {
+            $('#cardnodevice-in').trigger('focus');
+        });
+
+        $('button[data-bs-target="#checkOutTab"]').on('shown.bs.tab', function() {
+            $('#cardnodevice-out').trigger('focus');
+        });
+
 
         $(document).ready(function() {
             $.ajaxSetup({
@@ -355,7 +441,7 @@
                     },
                     {
                         data: 'jam_masuk_formatted',
-                        name: 'jam_masuk    '
+                        name: 'jam_masuk'
                     },
                     {
                         data: 'jam_keluar_formatted',
@@ -373,135 +459,6 @@
             $('#data-tab').on('click', function() {
                 $('#tableAttendance').DataTable().ajax
                     .reload()
-            });
-
-            $('#formRegistrasi').submit(function(e) {
-                e.preventDefault();
-
-                $.ajax({
-                    data: $(this).serialize(),
-                    url: "{{ route('attendance.store') }}",
-                    type: "POST",
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $('#saveRegistrasi').prop('disabled', true).html(
-                            '<i class="mdi mdi-loading mdi-spin me-2"></i> Proses...'
-                        );
-
-                        $('.form-control').removeClass('is-invalid');
-                        $('.text-danger').html('');
-                    },
-                    complete: function() {
-                        $('#saveRegistrasi').prop('disabled', false).text('Simpan');
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Sukses',
-                                text: response.message,
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            console.error(response.message);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Terjadi kesalahan, silakan coba lagi.',
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        let response = xhr.responseJSON;
-                        console.error(response);
-
-                        if (xhr.status === 403) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Sudah Terdaftar',
-                                text: response.message,
-                            });
-                            return;
-                        }
-
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: 'Terjadi kesalahan, silakan coba lagi.',
-                        });
-                    }
-                });
-            });
-
-            $('#formCheckOut').submit(function(e) {
-                e.preventDefault();
-
-                $.ajax({
-                    data: $(this).serialize(),
-                    url: "{{ route('attendance.checkout') }}",
-                    type: "POST",
-                    dataType: 'json',
-                    beforeSend: function() {
-                        $('#saveCheckOut').prop('disabled', true).html(
-                            '<i class="mdi mdi-loading mdi-spin me-2"></i> Proses...'
-                        );
-
-                        $('.form-control').removeClass('is-invalid');
-                        $('.text-danger').html('');
-                    },
-                    complete: function() {
-                        $('#saveCheckOut').prop('disabled', false).text('Simpan');
-                    },
-                    success: function(res) {
-                        if (res.status === 'success') {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil',
-                                text: res.message,
-                            }).then(() => {
-                                location.reload();
-                            });
-                        } else {
-                            console.error(res.message);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Terjadi kesalahan, silakan coba lagi.',
-                            });
-                        }
-                    },
-                    error: function(xhr) {
-                        let response = xhr.responseJSON;
-
-                        if (xhr.status === 403) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Sudah Keluar',
-                                text: response.message,
-                            });
-                            $('#btnResetRFID').click();
-                            return;
-                        } else if (xhr.status === 404) {
-                            Swal.fire({
-                                icon: 'warning',
-                                title: 'Tidak Ditemukan',
-                                text: response.message,
-                            });
-                            $('#btnResetRFID').click();
-                            return;
-                        } else {
-                            console.error(response);
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Terjadi kesalahan, silakan coba lagi.',
-                            });
-                        }
-
-                    }
-                });
             });
 
             $('#btnExportExcel').click(function(e) {

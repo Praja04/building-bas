@@ -35,7 +35,7 @@ class AttendanceController extends Controller
                     } elseif ($row->is_doorprize === 0) {
                         return '<span class="badge bg-danger">Tidak</span>';
                     } else {
-                        return '-';
+                        return '<span class="badge bg-secondary">Belum Ditentukan</span>';
                     }
                 })
                 ->rawColumns(['status_doorprize'])
@@ -122,9 +122,10 @@ class AttendanceController extends Controller
 
             // cek kelayakan doorprize (jam masuk > 8 -> tidak dapat)
             $jamMasuk = now();
-            $batasMasuk = $jamMasuk->clone()->setTime(8, 0, 0);
+            $batasMasuk = Carbon::today()->setTime(8, 0, 0);
+            $isLate = $jamMasuk->gt($batasMasuk);
 
-            $eligibleForDoorprize = $jamMasuk->greaterThan($batasMasuk) ? false : null;
+            $eligibleForDoorprize = $isLate ? false : null;
 
             $peserta = Attendance::create([
                 'cardnodevice' => $request->cardnodevice,
@@ -138,7 +139,12 @@ class AttendanceController extends Controller
             return response()->json([
                 'status' => 'success',
                 'message' => 'Berhasil registrasi!',
-                'data' => $peserta
+                'data' => [
+                    'nik' => $peserta->nik,
+                    'nama_pegawai' => $peserta->nama_pegawai,
+                    'departemen' => $peserta->departemen,
+                    'jam_masuk_formatted'    => Carbon::parse($peserta->jam_masuk)->format('d M Y H:i'),
+                ]
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
@@ -174,19 +180,18 @@ class AttendanceController extends Controller
             $jamKeluar = now();
             $jamMasuk = Carbon::parse($peserta->jam_masuk);
 
-            $batasMasuk  = $jamMasuk->clone()->setTime(8, 0, 0);
-            $batasKeluar = $jamKeluar->clone()->setTime(14, 0, 0);
+            $batasMasuk = Carbon::today()->setTime(8, 0, 0);
+            $batasKeluar = Carbon::today()->setTime(14, 0, 0);
 
-            if ($jamMasuk->greaterThan($batasMasuk)) {
-                // datang telat -> gagal
+            $isLate = $jamMasuk->gt($batasMasuk);
+            $keluarSebelumWaktu = $jamKeluar->lt($batasKeluar);
+
+            if ($isLate) {
+                $statusDoorprize = false;
+            } elseif ($keluarSebelumWaktu) {
                 $statusDoorprize = false;
             } else {
-                if ($jamKeluar->lessThan($batasKeluar)) {
-                    $statusDoorprize = false;
-                } else {
-                    // datang tepat waktu && harus pulang >= 14:00
-                    $statusDoorprize = $jamKeluar->greaterThanOrEqualTo($batasKeluar);
-                }
+                $statusDoorprize = true;
             }
 
             $peserta->update([
@@ -197,7 +202,12 @@ class AttendanceController extends Controller
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Checkout berhasil!',
-                'data'    => $peserta
+                'data' => [
+                    'nik' => $peserta->nik,
+                    'nama_pegawai' => $peserta->nama_pegawai,
+                    'departemen' => $peserta->departemen,
+                    'jam_keluar_formatted'    => Carbon::parse($peserta->jam_keluar)->format('d M Y H:i'),
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json([
