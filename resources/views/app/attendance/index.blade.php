@@ -306,6 +306,8 @@
                             // ajax checkout
                             $('.checkOutResult').removeClass('d-none');
                             $('#nik-out').val(res.data.nik);
+                            $('#nama_pegawai-out').val(res.data.nama);
+                            $('#departemen-out').val(res.data.departemen);
 
                             $.ajax({
                                 // checkout data
