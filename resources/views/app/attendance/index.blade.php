@@ -177,8 +177,8 @@
                                     <th>Nama Peserta</th>
                                     <th>Departemen</th>
                                     <th>Jam Masuk</th>
-                                    <th>Jam Pulang</th>
-                                    <th>Status Doorprize</th>
+                                    <th>Jam Keluar</th>
+                                    <th>Status Layak Doorprize</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
