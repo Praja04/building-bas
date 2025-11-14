@@ -83,7 +83,6 @@ class AttendanceController extends Controller
                 'message' => 'Data karyawan tidak ditemukan.'
             ], 404);
         } catch (\Exception $e) {
-
             Log::error('[AttendanceController getUser]', [
                 'error' => $e->getMessage(),
                 'input' => $input
@@ -95,7 +94,6 @@ class AttendanceController extends Controller
             ], 500);
         }
     }
-
 
     public function store(Request $request)
     {
@@ -125,7 +123,7 @@ class AttendanceController extends Controller
             $batasMasuk = Carbon::today()->setTime(8, 0, 0);
             $isLate = $jamMasuk->gt($batasMasuk);
 
-            $eligibleForDoorprize = $isLate ? false : null;
+            $eligibleForDoorprize = $isLate ? false : true;
 
             $peserta = Attendance::create([
                 'cardnodevice' => $request->cardnodevice,
