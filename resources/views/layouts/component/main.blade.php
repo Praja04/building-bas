@@ -36,6 +36,13 @@
        <script src="https://code.jquery.com/jquery-3.7.1.min.js"
            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
 
+       <style>
+           .swal2-backdrop-show {
+               backdrop-filter: none;
+               background: transparent;
+           }
+       </style>
+
        @yield('style')
    </head>
 
@@ -51,8 +58,6 @@
            @include('layouts.component.topbar')
            <!-- Topbar End -->
 
-
-
            <!-- ============================================================== -->
            <!-- Start Main Content -->
            <!-- ============================================================== -->
@@ -61,9 +66,7 @@
 
                <div class="container-fluid">
 
-
                    @yield('content')
-
 
                </div>
                <!-- container -->
@@ -95,6 +98,8 @@
        <script src="{{ asset('assets') }}/plugins/datatables/dataTables.bootstrap5.min.js"></script>
        <script src="{{ asset('assets') }}/plugins/datatables/dataTables.responsive.min.js"></script>
        <script src="{{ asset('assets') }}/plugins/datatables/responsive.bootstrap5.min.js"></script>
+
+       <script src="{{ asset('js/toast.js') }}"></script>
 
        <script>
            new DataTable('[data-tables="basic"]', {

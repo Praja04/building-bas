@@ -54,9 +54,11 @@
                                         <div class="col-12">
                                             <div class="row g-2 align-items-end">
                                                 <div class="col">
-                                                    <label class="form-label fw-semibold">Scan Kartu RFID</label>
+                                                    <label class="form-label fw-semibold">Scan Kartu RFID/Masukan
+                                                        NIK</label>
                                                     <input type="text" class="form-control" id="cardnodevice"
-                                                        name="cardnodevice" placeholder="Tempelkan kartu..." autofocus>
+                                                        name="cardnodevice" placeholder="Tempelkan kartu/Masukan NIK..."
+                                                        autofocus>
                                                 </div>
                                                 <div class="col-auto">
                                                     <button type="button" class="btn btn-outline-secondary"
@@ -177,20 +179,6 @@
                                         "{{ asset('assets/images/no-image.jpg') }}");
                                 }
 
-                                // Toast Success
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 4000,
-                                    timerProgressBar: true,
-                                    didOpen: (toast) => {
-                                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                                        toast.addEventListener('mouseleave', Swal
-                                            .resumeTimer)
-                                    }
-                                });
-
                                 Toast.fire({
                                     icon: 'success',
                                     title: 'Pengambilan Makan Berhasil!',
@@ -213,7 +201,7 @@
                         error: function(xhr) {
                             let res = xhr.responseJSON;
 
-                            if (xhr.status === 403 && res.status === 'rejected') {
+                            if (xhr.error_code === 'SUDAH_AMBIL') {
                                 // ❌ DITOLAK - Sudah ambil hari ini
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
@@ -224,20 +212,6 @@
                                 if (res.data.foto) {
                                     $('#fotoPegawai').attr('src', res.data.foto);
                                 }
-
-                                // Toast Error
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 5000,
-                                    timerProgressBar: true,
-                                    didOpen: (toast) => {
-                                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                                        toast.addEventListener('mouseleave', Swal
-                                            .resumeTimer)
-                                    }
-                                });
 
                                 Toast.fire({
                                     icon: 'error',
@@ -259,17 +233,31 @@
                                     $('#tablePengambilan').DataTable().ajax.reload(null, false);
                                 }, 4000);
 
+                            } else if (xhr.error_code === 'BELUM_MASUK') {
+                                // ❌ DITOLAK - Belum masuk
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
+
+                                $('#nik').val(res.data.nik);
+                                $('#nama_pegawai').val(res.data.nama);
+                                $('#departemen').val(res.data.departemen || '');
+
+                                if (res.data.foto) {
+                                    $('#fotoPegawai').attr('src', res.data.foto);
+                                }
+
+                                Toast.fire({
+                                    icon: 'error',
+                                    title: 'Pengambilan Ditolak!',
+                                    text: "Anda belum melakukan registrasi, tidak dapat mengambil makan!"
+                                });
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 4000);
                             } else if (xhr.status === 404) {
                                 // ❌ Kartu tidak ditemukan
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
-
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true
-                                });
 
                                 Toast.fire({
                                     icon: 'error',
@@ -287,14 +275,6 @@
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
                                 console.error('Error:', xhr);
-
-                                const Toast = Swal.mixin({
-                                    toast: true,
-                                    position: 'top-end',
-                                    showConfirmButton: false,
-                                    timer: 3000,
-                                    timerProgressBar: true
-                                });
 
                                 Toast.fire({
                                     icon: 'error',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\PengambilanMakan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -34,26 +35,55 @@ class PengambilanMakanController extends Controller
         return view('app.pengambilan-makan.index');
     }
 
-    public function getByCard($cardnodevice)
+    public function getByCard($input)
     {
         try {
-            // Ambil data dari database eksternal
+            // 1️. CARI BERDASARKAN CARDNODEVICE
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
-                ->where('CARDNODEVICE', $cardnodevice)
+                ->where('CARDNODEVICE', $input)
                 ->first();
 
+            // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK
+            if (!$data) {
+                $data = DB::connection('192.168.178.44-admin')
+                    ->table('MSIDCARD')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                    ->where('NIK', $input)
+                    ->first();
+            }
+
+            // JIKA MASIH TIDAK ADA → RETURN TIDAK TERDAFTAR
             if (!$data) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Kartu tidak ditemukan di sistem!'
+                    'message' => 'Data tidak ditemukan, kartu atau NIK tidak terdaftar!'
                 ], 404);
+            }
+
+            // VALIDASI KEHADIRAN (HARUS SUDAH ADA DI TABEL ATTENDANCE)
+            $isRegist = Attendance::where('nik', $data->nik)
+                ->whereDate('jam_masuk', Carbon::today())
+                ->first();
+
+            if (!$isRegist) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'error_code' => 'BELUM_MASUK',
+                    'message' => 'Anda belum melakukan registrasi, tidak dapat mengambil makan!',
+                    'data' => [
+                        'nik' => $data->nik,
+                        'nama' => $data->nama,
+                        'departemen' => $data->departemen,
+                        'foto' => $this->convertBlobToBase64($data->foto)
+                    ]
+                ], 403);
             }
 
             // VALIDASI PENGAMBILAN HARI INI (hanya boleh 1 kali)
             $today = Carbon::today();
-            $pengambilanHariIni = PengambilanMakan::where('cardnodevice', $cardnodevice)
+            $pengambilanHariIni = PengambilanMakan::where('cardnodevice', $input)
                 ->whereDate('waktu_ambil', $today)
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();
@@ -64,6 +94,7 @@ class PengambilanMakanController extends Controller
 
                 return response()->json([
                     'status' => 'rejected',
+                    'error_code' => 'SUDAH_AMBIL',
                     'message' => 'Pengambilan makan sudah dilakukan hari ini!',
                     'data' => [
                         'nik' => $data->nik,
@@ -77,7 +108,7 @@ class PengambilanMakanController extends Controller
             }
 
             // Hitung total pengambilan hari ini (untuk memastikan tidak lebih dari 1)
-            $totalPengambilanHariIni = PengambilanMakan::where('cardnodevice', $cardnodevice)
+            $totalPengambilanHariIni = PengambilanMakan::where('cardnodevice', $input)
                 ->whereDate('waktu_ambil', $today)
                 ->count();
 
@@ -85,6 +116,7 @@ class PengambilanMakanController extends Controller
             if ($totalPengambilanHariIni > 0) {
                 return response()->json([
                     'status' => 'rejected',
+                    'error_code' => 'SUDAH_AMBIL',
                     'message' => 'Anda sudah mencapai batas pengambilan makan hari ini!',
                     'data' => [
                         'nik' => $data->nik,
@@ -97,7 +129,7 @@ class PengambilanMakanController extends Controller
 
             // SIMPAN DATA PENGAMBILAN MAKAN (First time today)
             $pengambilan = PengambilanMakan::create([
-                'cardnodevice' => $cardnodevice,
+                'cardnodevice' => $input,
                 'nik' => $data->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
@@ -127,7 +159,7 @@ class PengambilanMakanController extends Controller
         } catch (\Exception $e) {
             Log::error('Error Pengambilan Makan', [
                 'error' => $e->getMessage(),
-                'cardnodevice' => $cardnodevice
+                'cardnodevice' => $input
             ]);
 
             return response()->json([
