@@ -228,14 +228,15 @@
                                     // success store
                                     Toast.fire({
                                         icon: 'success',
+                                        background: "#28a745",
                                         title: 'Berhasil!',
                                         html: `
-                                                <div class="text-start">
-                                                    <strong>${response.data.nama_pegawai}</strong><br>
-                                                    <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
-                                                    <small>Jam Masuk: ${response.data.jam_masuk_formatted} WIB</small>
-                                                </div>
-                                            `
+                                            <div class="text-start">
+                                                <strong>${response.data.nama_pegawai}</strong><br>
+                                                <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
+                                                <small>Jam Masuk: ${response.data.jam_masuk_formatted} WIB</small>
+                                            </div>
+                                        `
                                     })
                                     $('#btnResetRFID').click();
                                 },
@@ -245,6 +246,7 @@
                                     if (xhr.status === 403) {
                                         Toast.fire({
                                             icon: 'warning',
+                                            background: "#fd7e14",
                                             title: 'Sudah Terdaftar!',
                                             text: 'Peserta sudah melakukan registrasi sebelumnya'
 
@@ -252,6 +254,7 @@
                                     } else {
                                         Toast.fire({
                                             icon: 'error',
+                                            background: "#dc3545",
                                             title: 'Gagal!',
                                             text: 'Terjadi kesalahan dalam menyimpan data'
                                         })
@@ -266,12 +269,14 @@
                             if (xhr.status === 404) {
                                 Toast.fire({
                                     icon: 'warning',
+                                    background: "#fd7e14",
                                     title: 'Tidak Ditemukan!',
                                     text: 'Karyawan tidak terdaftar dalam sistem'
                                 })
                             } else {
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Gagal!',
                                     text: 'Terjadi kesalahan dalam scan ID card'
                                 })
@@ -321,6 +326,7 @@
                                     // success checkout
                                     Toast.fire({
                                         icon: 'success',
+                                        background: "#28a745",
                                         title: 'Berhasil Checkout!',
                                         html: `
                                                 <div class="text-start">
@@ -338,17 +344,20 @@
                                     if (xhr.status === 403) {
                                         Toast.fire({
                                             icon: 'warning',
+                                            background: "#fd7e14",
                                             title: 'Sudah Keluar!',
                                             text: 'Peserta sudah melakukan checkout sebelumnya'
                                         });
                                     } else if (xhr.status === 404) {
                                         Toast.fire({
+                                            background: "#fd7e14",
                                             icon: 'warning',
                                             title: 'Tidak Ditemukan!',
                                             text: 'Peserta belum melakukan registrasi/masuk'
                                         });
                                     } else {
                                         Toast.fire({
+                                            background: "#dc3545",
                                             icon: 'error',
                                             title: 'Error!',
                                             text: 'Terjadi kesalahan saat proses checkout'
@@ -366,12 +375,14 @@
                             if (xhr.status === 404) {
                                 Toast.fire({
                                     icon: 'warning',
+                                    background: "#fd7e14",
                                     title: 'Tidak Ditemukan!',
                                     text: 'Karyawan tidak terdaftar dalam sistem'
                                 })
                             } else {
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Gagal!',
                                     text: 'Terjadi kesalahan dalam scan ID card'
                                 })

@@ -181,6 +181,7 @@
 
                                 Toast.fire({
                                     icon: 'success',
+                                    background: "#28a745",
                                     title: 'Pengambilan Makan Berhasil!',
                                     html: `
                                 <div class="text-start">
@@ -215,6 +216,7 @@
 
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Pengambilan Ditolak!',
                                     html: `
                                 <div class="text-start">
@@ -247,6 +249,7 @@
 
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Pengambilan Ditolak!',
                                     text: "Anda belum melakukan registrasi, tidak dapat mengambil makan!"
                                 });
@@ -261,6 +264,7 @@
 
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Kartu Tidak Terdaftar',
                                     text: res.message || 'Kartu tidak ditemukan di sistem'
                                 });
@@ -278,6 +282,7 @@
 
                                 Toast.fire({
                                     icon: 'error',
+                                    background: "#dc3545",
                                     title: 'Terjadi Kesalahan',
                                     text: res?.message ||
                                         'Terjadi kesalahan saat memproses data'
