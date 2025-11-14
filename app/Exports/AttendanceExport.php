@@ -21,8 +21,9 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
      */
     public function collection()
     {
-        return Attendance::select('nik', 'nama_pegawai', 'departemen')
-            ->where('is_doorprize', 1)
+        return Attendance::select('nik', 'nama_pegawai', 'departemen', 'jam_masuk', 'jam_keluar', 'is_doorprize')
+            // ->where('is_doorprize', 1)
+            ->orderBy('is_doorprize', 'asc') // 0 dulu, lalu 1
             ->get();
     }
 
@@ -31,7 +32,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
      */
     public function headings(): array
     {
-        return ["No", "NIK", "Nama Pegawai", "Departemen"];
+        return ["No", "NIK", "Nama Pegawai", "Departemen", "Jam Masuk", "Jam Keluar", "Layak Doorprize"];
     }
 
     /**
@@ -46,6 +47,13 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             $attendance->nik,
             $attendance->nama_pegawai,
             $attendance->departemen,
+            $attendance->jam_masuk,
+            $attendance->jam_keluar ?? "Belum Keluar",
+            $attendance->is_doorprize === 1
+                ? "Ya"
+                : ($attendance->is_doorprize === 0
+                    ? "Tidak"
+                    : "Belum Ditentukan"),
         ];
     }
 
@@ -58,7 +66,10 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             'A' => 6,   // No
             'B' => 15,  // NIK
             'C' => 30,  // Nama Pegawai
-            'D' => 25,  // Departemen
+            'D' => 15,  // Departemen
+            'E' => 25,  // Jam Masuk 
+            'F' => 25,  // Jam Keluar
+            'G' => 25,  // Status Layak
         ];
     }
 
@@ -70,7 +81,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         $rowCount = $sheet->getHighestRow();
 
         // Style untuk header (baris 1)
-        $sheet->getStyle('A1:D1')->applyFromArray([
+        $sheet->getStyle('A1:G1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -93,7 +104,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         ]);
 
         // Style untuk semua data (termasuk border)
-        $sheet->getStyle('A1:D' . $rowCount)->applyFromArray([
+        $sheet->getStyle('A1:G' . $rowCount)->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -105,9 +116,11 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
             ],
         ]);
 
-        // Alignment center untuk kolom No dan NIK
+        // Alignment center
         $sheet->getStyle('A2:A' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2:B' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('D2:D' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G2:G' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         return [];
     }
