@@ -44,12 +44,20 @@
                      <span class="menu-text" data-lang="penitipan-barang">Penitipan Barang</span>
                  </a>
              </li> --}}
-             
+
              <li class="side-nav-item">
                  <a href="{{ route('pengambilan-makan.index') }}"
                      class="side-nav-link {{ request()->routeIs('pengambilan-makan.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="utensils"></i></span>
                      <span class="menu-text" data-lang="pengambilan-makan">Pengambilan Makan</span>
+                 </a>
+             </li>
+
+             <li class="side-nav-item">
+                 <a href="{{ route('pengambilan-kaos.index') }}"
+                     class="side-nav-link {{ request()->routeIs('pengambilan-kaos.index') ? 'active' : '' }}">
+                     <span class="menu-icon"><i data-lucide="shopping-bag"></i></span>
+                     <span class="menu-text" data-lang="pengambilan-kaos">Pengambilan Kaos</span>
                  </a>
              </li>
          </ul>

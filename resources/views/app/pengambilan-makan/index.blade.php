@@ -182,14 +182,20 @@
                                 Toast.fire({
                                     icon: 'success',
                                     background: "#28a745",
+                                    color: '#ffffff',
                                     title: 'Pengambilan Makan Berhasil!',
                                     html: `
                                 <div class="text-start">
                                     <strong>${res.data.nama}</strong><br>
-                                    <small class="text-muted">${res.data.nik} - ${res.data.departemen}</small><br>
+                                    <small>${res.data.nik} - ${res.data.departemen}</small><br>
                                     <small>Tanggal: ${res.data.tanggal} | Waktu: ${res.data.waktu_ambil} WIB</small>
                                 </div>
-                            `
+                            `,
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 });
 
                                 // Auto reset setelah 3 detik
@@ -217,17 +223,23 @@
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Pengambilan Ditolak!',
                                     html: `
-                                <div class="text-start">
-                                    <strong>${res.data.nama}</strong><br>
-                                    <small class="text-muted">${res.data.nik}</small><br>
-                                    <hr class="my-1">
-                                    <small class="text-danger"><strong>${res.message}</strong></small><br>
-                                    <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
-                                    <small><strong>Batas: 1x per hari</strong></small>
-                                </div>
-                            `
+                                            <div class="text-start">
+                                                <strong>${res.data.nama}</strong><br>
+                                                <small>${res.data.nik}</small><br>
+                                                <hr class="my-1">
+                                                <small class="text-danger"><strong>${res.message}</strong></small><br>
+                                                <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
+                                                <small><strong>Batas: 1x per hari</strong></small>
+                                            </div>
+                                        `,
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 });
 
                                 setTimeout(() => {
@@ -250,8 +262,14 @@
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Pengambilan Ditolak!',
-                                    text: "Anda belum melakukan registrasi, tidak dapat mengambil makan!"
+                                    text: "Anda belum melakukan registrasi, tidak dapat mengambil makan!",
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 });
 
                                 setTimeout(() => {
@@ -265,8 +283,14 @@
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Kartu Tidak Terdaftar',
-                                    text: res.message || 'Kartu tidak ditemukan di sistem'
+                                    text: res.message || 'Kartu tidak ditemukan di sistem',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 });
 
                                 setTimeout(() => {
@@ -283,9 +307,15 @@
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Terjadi Kesalahan',
                                     text: res?.message ||
-                                        'Terjadi kesalahan saat memproses data'
+                                        'Terjadi kesalahan saat memproses data',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 });
 
                                 setTimeout(() => {

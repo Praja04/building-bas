@@ -229,14 +229,20 @@
                                     Toast.fire({
                                         icon: 'success',
                                         background: "#28a745",
+                                        color: '#ffffff',
                                         title: 'Berhasil!',
                                         html: `
                                             <div class="text-start">
                                                 <strong>${response.data.nama_pegawai}</strong><br>
-                                                <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
+                                                <small>${response.data.nik} - ${response.data.departemen}</small><br>
                                                 <small>Jam Masuk: ${response.data.jam_masuk_formatted} WIB</small>
                                             </div>
-                                        `
+                                        `,
+                                        customClass: {
+                                            popup: 'text-white',
+                                            title: 'text-white',
+                                            htmlContainer: 'text-white'
+                                        }
                                     })
                                     $('#btnResetRFID').click();
                                 },
@@ -247,16 +253,27 @@
                                         Toast.fire({
                                             icon: 'warning',
                                             background: "#fd7e14",
+                                            color: '#ffffff',
                                             title: 'Sudah Terdaftar!',
-                                            text: 'Peserta sudah melakukan registrasi sebelumnya'
-
+                                            text: 'Peserta sudah melakukan registrasi sebelumnya',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
                                         });
                                     } else {
                                         Toast.fire({
                                             icon: 'error',
                                             background: "#dc3545",
+                                            color: '#ffffff',
                                             title: 'Gagal!',
-                                            text: 'Terjadi kesalahan dalam menyimpan data'
+                                            text: 'Terjadi kesalahan dalam menyimpan data',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
                                         })
                                     }
                                     $('#btnResetRFID').click();
@@ -270,15 +287,27 @@
                                 Toast.fire({
                                     icon: 'warning',
                                     background: "#fd7e14",
+                                    color: '#ffffff',
                                     title: 'Tidak Ditemukan!',
-                                    text: 'Karyawan tidak terdaftar dalam sistem'
+                                    text: 'Karyawan tidak terdaftar dalam sistem',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 })
                             } else {
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Gagal!',
-                                    text: 'Terjadi kesalahan dalam scan ID card'
+                                    text: 'Terjadi kesalahan dalam scan ID card',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 })
                             }
                             $('#btnResetRFID').click();
@@ -327,14 +356,20 @@
                                     Toast.fire({
                                         icon: 'success',
                                         background: "#28a745",
+                                        color: '#ffffff',
                                         title: 'Berhasil Checkout!',
                                         html: `
                                                 <div class="text-start">
                                                     <strong>${response.data.nama_pegawai}</strong><br>
-                                                    <small class="text-muted">${response.data.nik} - ${response.data.departemen}</small><br>
+                                                    <small>${response.data.nik} - ${response.data.departemen}</small><br>
                                                     <small>Jam Keluar: ${response.data.jam_keluar_formatted} WIB</small>
                                                 </div>
-                                            `
+                                            `,
+                                        customClass: {
+                                            popup: 'text-white',
+                                            title: 'text-white',
+                                            htmlContainer: 'text-white'
+                                        }
                                     })
                                     $('#btnResetRFID-out').click();
                                 },
@@ -345,22 +380,40 @@
                                         Toast.fire({
                                             icon: 'warning',
                                             background: "#fd7e14",
+                                            color: '#ffffff',
                                             title: 'Sudah Keluar!',
-                                            text: 'Peserta sudah melakukan checkout sebelumnya'
+                                            text: 'Peserta sudah melakukan checkout sebelumnya',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
                                         });
                                     } else if (xhr.status === 404) {
                                         Toast.fire({
                                             background: "#fd7e14",
+                                            color: '#ffffff',
                                             icon: 'warning',
                                             title: 'Tidak Ditemukan!',
-                                            text: 'Peserta belum melakukan registrasi/masuk'
+                                            text: 'Peserta belum melakukan registrasi/masuk',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
                                         });
                                     } else {
                                         Toast.fire({
                                             background: "#dc3545",
+                                            color: '#ffffff',
                                             icon: 'error',
                                             title: 'Error!',
-                                            text: 'Terjadi kesalahan saat proses checkout'
+                                            text: 'Terjadi kesalahan saat proses checkout',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
                                         });
                                     }
                                     $('#btnResetRFID-out').click();
@@ -376,15 +429,27 @@
                                 Toast.fire({
                                     icon: 'warning',
                                     background: "#fd7e14",
+                                    color: '#ffffff',
                                     title: 'Tidak Ditemukan!',
-                                    text: 'Karyawan tidak terdaftar dalam sistem'
+                                    text: 'Karyawan tidak terdaftar dalam sistem',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 })
                             } else {
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
+                                    color: '#ffffff',
                                     title: 'Gagal!',
-                                    text: 'Terjadi kesalahan dalam scan ID card'
+                                    text: 'Terjadi kesalahan dalam scan ID card',
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
                                 })
                             }
                             $('#btnResetRFID-out').click();

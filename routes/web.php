@@ -16,16 +16,16 @@ Route::prefix('pengambilan-makan')->group(function () {
    Route::post('/ambil/{id}', [App\Http\Controllers\PengambilanMakanController::class, 'ambil'])->name('pengambilan-makan.ambil');
 });
 
-Route::prefix('pengambilan-makan')->group(function () {
-   Route::get('/', [App\Http\Controllers\PengambilanMakanController::class, 'index'])->name('pengambilan-makan.index');
-   Route::get('/get-by-card/{cardnodevice}', [App\Http\Controllers\PengambilanMakanController::class, 'getByCard'])->name('pengambilan-makan.getByCard');
-   Route::post('/ambil/{id}', [App\Http\Controllers\PengambilanMakanController::class, 'ambil'])->name('pengambilan-makan.ambil');
-});
-
 Route::prefix('attendance')->group(function () {
    Route::get('/', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
    Route::get('/user/{cardnodevice}', [App\Http\Controllers\AttendanceController::class, 'getUser'])->name('attendance.getByCard');
    Route::post('/store', [App\Http\Controllers\AttendanceController::class, 'store'])->name('attendance.store');
    Route::post('/checkout', [App\Http\Controllers\AttendanceController::class, 'checkout'])->name('attendance.checkout');
    Route::get('/export', [App\Http\Controllers\AttendanceController::class, 'export'])->name('attendance.export');
+});
+
+Route::prefix('pengambilan-kaos')->group(function () {
+   Route::get('/', [App\Http\Controllers\PengambilanKaosController::class, 'index'])->name('pengambilan-kaos.index');
+   Route::get('/get-by-card/{cardnodevice}', [App\Http\Controllers\PengambilanKaosController::class, 'getByCard'])->name('pengambilan-kaos.getByCard');
+   Route::post('/ambil/{id}', [App\Http\Controllers\PengambilanKaosController::class, 'ambil'])->name('pengambilan-kaos.ambil');
 });
