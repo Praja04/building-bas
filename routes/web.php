@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', [App\Http\Controllers\AttendanceController::class, 'index'])->name('attendance.index');
+
 Route::prefix('penitipan-barang')->group(function () {
    Route::get('/', [App\Http\Controllers\PenitipanBarangController::class, 'index'])->name('penitipan-barang.index');
    Route::get('/get-by-card/{cardnodevice}', [App\Http\Controllers\PenitipanBarangController::class, 'getByCard'])->name('penitipan-barang.getByCard');
