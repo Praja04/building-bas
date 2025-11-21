@@ -1,7 +1,7 @@
  <div class="sidenav-menu">
 
      <!-- Brand Logo -->
-     <a href="index.html" class="logo">
+     <a href="/" class="logo">
          <span class="logo logo-light">
              <span class="logo-lg"><img src="{{ asset('assets') }}/images/logos/bas.png" alt="logo"
                      style="height: 50px"></span>
