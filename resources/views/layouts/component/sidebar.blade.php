@@ -26,14 +26,15 @@
      </button>
 
      <div class="scrollbar" data-simplebar>
-         <!--- Sidenav Menu -->
+         <!--- Menu -->
          <ul class="side-nav">
-             <li class="side-nav-title mt-2" data-lang="menu-title">Navigasi</li>
+             {{-- Menu --}}
+             <li class="side-nav-title mt-2">Menu</li>
              <li class="side-nav-item">
                  <a href="{{ route('attendance.index') }}"
                      class="side-nav-link {{ request()->routeIs('attendance.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="person-standing"></i></span>
-                     <span class="menu-text" data-lang="attendance">Kehadiran</span>
+                     <span class="menu-text">Kehadiran</span>
                  </a>
              </li>
 
@@ -41,7 +42,7 @@
                  <a href="{{ route('penitipan-barang.index') }}"
                      class="side-nav-link {{ request()->routeIs('penitipan-barang.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="package"></i></span>
-                     <span class="menu-text" data-lang="penitipan-barang">Penitipan Barang</span>
+                     <span class="menu-text">Penitipan Barang</span>
                  </a>
              </li> --}}
 
@@ -49,7 +50,7 @@
                  <a href="{{ route('pengambilan-makan.index') }}"
                      class="side-nav-link {{ request()->routeIs('pengambilan-makan.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="utensils"></i></span>
-                     <span class="menu-text" data-lang="pengambilan-makan">Pengambilan Makan</span>
+                     <span class="menu-text">Pengambilan Makan</span>
                  </a>
              </li>
 
@@ -57,9 +58,28 @@
                  <a href="{{ route('pengambilan-kaos.index') }}"
                      class="side-nav-link {{ request()->routeIs('pengambilan-kaos.index') ? 'active' : '' }}">
                      <span class="menu-icon"><i data-lucide="shopping-bag"></i></span>
-                     <span class="menu-text" data-lang="pengambilan-kaos">Pengambilan Kaos</span>
+                     <span class="menu-text">Pengambilan Kaos</span>
                  </a>
              </li>
+
+             {{-- Master Data --}}
+             <li class="side-nav-title mt-2">Master Data</li>
+             <li class="side-nav-item">
+                 <a href="{{ route('participants.index') }}"
+                     class="side-nav-link {{ request()->routeIs('participants.index') ? 'active' : '' }}">
+                     <span class="menu-icon"><i data-lucide="users"></i></span>
+                     <span class="menu-text">Peserta</span>
+                 </a>
+             </li>
+             {{-- todo: kegiatan --}}
+             {{-- <li class="side-nav-item">
+                 <a href="{{ route('kegiatan.index') }}"
+                     class="side-nav-link {{ request()->routeIs('kegiatan.index') ? 'active' : '' }}">
+                     <span class="menu-icon"><i data-lucide="calendar"></i></span>
+                     <span class="menu-text">Kegiatan</span>
+                 </a>
+             </li> --}}
+
          </ul>
      </div>
  </div>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Participant;
 use App\Models\PengambilanKaos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -43,21 +44,66 @@ class PengambilanKaosController extends Controller
                 ->where('CARDNODEVICE', $input)
                 ->first();
 
-            // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK
+            // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK 
             if (!$data) {
                 $data = DB::connection('192.168.178.44-admin')
                     ->table('MSIDCARD')
                     ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
                     ->first();
+
+                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
+                if (!$data && !str_starts_with($input, '0')) {
+
+                    $data = DB::connection('192.168.178.44-admin')
+                        ->table('MSIDCARD')
+                        ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                        ->where('NIK', '0' . $input)
+                        ->first();
+                }
+            }
+
+            // cari di table participant
+            if (!$data) {
+                $peserta = Participant::where('nik', $input)->first();
+
+                if ($peserta) {
+                    $data = (object)[
+                        'nik'        => $peserta->nik,
+                        'nama'       => $peserta->nama,
+                        'departemen' => $peserta->departemen,
+                        'foto'       => null
+                    ];
+                }
             }
 
             // JIKA MASIH TIDAK ADA → RETURN TIDAK TERDAFTAR
             if (!$data) {
                 return response()->json([
                     'status' => 'error',
+                    'error_code' => 'TIDAK_TERDAFTAR_IDCARD',
                     'message' => 'Data tidak ditemukan, kartu atau NIK tidak terdaftar!'
                 ], 404);
+            }
+
+            // delete 0 di depan
+            $normalizedNik = ltrim($data->nik, '0');
+
+            // Cek apakah peserta terdaftar di tabel participants
+            $peserta = Participant::where('nik', $normalizedNik)->first();
+
+            if (!$peserta) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'error_code' => 'TIDAK_TERDAFTAR_PESERTA',
+                    'message' => 'Anda tidak berhak mengambil kaos. Anda tidak terdaftar sebagai peserta!',
+                    'data' => [
+                        'nik' => $data->nik,
+                        'nama' => $data->nama,
+                        'departemen' => $data->departemen,
+                        'foto' => $this->convertBlobToBase64($data->foto)
+                    ]
+                ], 403);
             }
 
             // VALIDASI PENGAMBILAN HANYA 1 KALI
@@ -85,7 +131,7 @@ class PengambilanKaosController extends Controller
             // SIMPAN DATA PENGAMBILAN KAOS (First time today)
             $pengambilan = PengambilanKaos::create([
                 'cardnodevice' => $input,
-                'nik' => $data->nik,
+                'nik' => $normalizedNik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
                 'waktu_ambil' => now(),

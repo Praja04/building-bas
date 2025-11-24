@@ -1,6 +1,6 @@
    <!DOCTYPE html>
    <html lang="en" data-skin="default" data-bs-theme="light" data-menu-color="light" data-topbar-color="light"
-       data-layout-position="fixed" data-sidenav-size="condensed" class="sidebar-enable">
+       data-layout-position="fixed" data-sidenav-size="condensed">
 
    <head>
        <meta charset="utf-8">
@@ -62,7 +62,7 @@
            <!-- Start Main Content -->
            <!-- ============================================================== -->
 
-           <div class="content-page">
+           <div class="content-page" style="min-height:calc(100dvh - var(--ins-topbar-height));">
 
                <div class="container-fluid">
 
@@ -98,7 +98,6 @@
        <script src="{{ asset('assets') }}/plugins/datatables/dataTables.bootstrap5.min.js"></script>
        <script src="{{ asset('assets') }}/plugins/datatables/dataTables.responsive.min.js"></script>
        <script src="{{ asset('assets') }}/plugins/datatables/responsive.bootstrap5.min.js"></script>
-
        <script src="{{ asset('js/toast.js') }}"></script>
 
        <script>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Participant;
 use App\Models\PengambilanMakan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -58,8 +59,26 @@ class PengambilanMakanController extends Controller
             if (!$data) {
                 return response()->json([
                     'status' => 'error',
+                    'error_code' => 'TIDAK_TERDAFTAR_IDCARD',
                     'message' => 'Data tidak ditemukan, kartu atau NIK tidak terdaftar!'
                 ], 404);
+            }
+
+            // CEK APAKAH TERDAFTAR SEBAGAI PESERTA
+            $peserta = Participant::where('nik', $data->nik)->first();
+
+            if (!$peserta) {
+                return response()->json([
+                    'status' => 'rejected',
+                    'error_code' => 'TIDAK_TERDAFTAR_PESERTA',
+                    'message' => 'Anda tidak berhak mengambil makan. Anda tidak terdaftar sebagai peserta!',
+                    'data' => [
+                        'nik' => $data->nik,
+                        'nama' => $data->nama,
+                        'departemen' => $data->departemen,
+                        'foto' => $this->convertBlobToBase64($data->foto)
+                    ]
+                ], 403);
             }
 
             // VALIDASI KEHADIRAN (HARUS SUDAH ADA DI TABEL ATTENDANCE)
@@ -81,21 +100,21 @@ class PengambilanMakanController extends Controller
                 ], 403);
             }
 
-            // VALIDASI PENGAMBILAN HARI INI (hanya boleh 1 kali)
+            // VALIDASI PENGAMBILAN (hanya boleh 1 kali)
             $today = Carbon::today();
             $pengambilanHariIni = PengambilanMakan::where('cardnodevice', $input)
                 ->whereDate('waktu_ambil', $today)
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();
 
-            // Jika sudah pernah ambil hari ini, TOLAK
+            // Jika sudah pernah ambil, TOLAK
             if ($pengambilanHariIni) {
                 $waktuAmbil = Carbon::parse($pengambilanHariIni->waktu_ambil)->format('H:i:s');
 
                 return response()->json([
                     'status' => 'rejected',
                     'error_code' => 'SUDAH_AMBIL',
-                    'message' => 'Pengambilan makan sudah dilakukan hari ini!',
+                    'message' => 'Pengambilan makan sudah dilakukan!',
                     'data' => [
                         'nik' => $data->nik,
                         'nama' => $data->nama,
@@ -107,7 +126,7 @@ class PengambilanMakanController extends Controller
                 ], 403);
             }
 
-            // Hitung total pengambilan hari ini (untuk memastikan tidak lebih dari 1)
+            // Hitung total pengambilan (untuk memastikan tidak lebih dari 1)
             $totalPengambilanHariIni = PengambilanMakan::where('cardnodevice', $input)
                 ->whereDate('waktu_ambil', $today)
                 ->count();

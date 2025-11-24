@@ -10,7 +10,12 @@ use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 use App\Exports\AttendanceExport;
+use App\Models\Participant;
 
+/**
+ * Controller untuk proses kehadiran (absensi).
+ * Referensinya ke tabel participants tapi bukan data peserta.
+ */
 class AttendanceController extends Controller
 {
     public function index(Request $request)
@@ -48,40 +53,34 @@ class AttendanceController extends Controller
     public function getUser($input)
     {
         try {
-            // --- 1. CARI BERDASARKAN CARDNODEVICE ---
+            // --- 1. Cari berdasarkan CARDNODEVICE ---
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen')
                 ->where('CARDNODEVICE', $input)
                 ->first();
 
-            // Jika ketemu lewat cardnodevice → langsung return
-            if ($data) {
-                return response()->json([
-                    'status' => 'success',
-                    'data' => $data
-                ], 200);
+            // --- 2. Jika tidak ditemukan → cari berdasarkan NIK ---
+            if (!$data) {
+                $data = DB::connection('192.168.178.44-admin')
+                    ->table('MSIDCARD')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen')
+                    ->where('NIK', $input)
+                    ->first();
             }
 
-            // --- 2. JIKA CARD TIDAK DITEMUKAN → CARI BERDASARKAN NIK ---
-            $dataByNik = DB::connection('192.168.178.44-admin')
-                ->table('MSIDCARD')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen')
-                ->where('NIK', $input)
-                ->first();
-
-            if ($dataByNik) {
+            // --- 3. Jika dua-duanya tidak ditemukan ---
+            if (!$data) {
                 return response()->json([
-                    'status' => 'success',
-                    'data' => $dataByNik
-                ], 200);
+                    'status' => 'error',
+                    'message' => 'Data karyawan tidak ditemukan.'
+                ], 404);
             }
 
-            // --- 3. KEDUA-DUANYA TIDAK DITEMUKAN ---
             return response()->json([
-                'status' => 'error',
-                'message' => 'Data karyawan tidak ditemukan.'
-            ], 404);
+                'status' => 'success',
+                'data' => $data
+            ], 200);
         } catch (\Exception $e) {
             Log::error('[AttendanceController getUser]', [
                 'error' => $e->getMessage(),
@@ -104,8 +103,16 @@ class AttendanceController extends Controller
                 'nama_pegawai' => 'required|string',
                 'departemen'   => 'required|string',
                 'is_doorprize' => 'nullable|boolean',
-
             ]);
+
+            $peserta = Participant::where('nik', $request->nik)->first();
+
+            if (!$peserta) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Registrasi ditolak. Anda tidak terdaftar sebagai peserta!',
+                ], 404);
+            }
 
             $existing = Attendance::whereDate('jam_masuk', now()->toDateString())
                 ->where('nik', $request->nik)
@@ -115,7 +122,7 @@ class AttendanceController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Peserta sudah melakukan registrasi.'
-                ], 403);
+                ], 409);
             }
 
             // cek kelayakan doorprize (jam masuk > 8 -> tidak dapat)
@@ -164,7 +171,7 @@ class AttendanceController extends Controller
             if (!$peserta) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'Peserta belum registrasi masuk.'
+                    'message' => 'Peserta belum registrasi masuk'
                 ], 404);
             }
 

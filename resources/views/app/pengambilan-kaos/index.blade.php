@@ -107,7 +107,7 @@
             <div class="tab-pane fade" id="dataTab" role="tabpanel">
                 <div class="card shadow-sm">
                     <div class="card-header bg-light">
-                        <h6 class="mb-0 fw-semibold">Daftar Barang Dititipkan</h6>
+                        <h6 class="mb-0 fw-semibold">Data Pengambilan Kaos</h6>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -208,7 +208,7 @@
                         error: function(xhr) {
                             let res = xhr.responseJSON;
 
-                            if (xhr.error_code === 'SUDAH_AMBIL') {
+                            if (res.error_code === 'SUDAH_AMBIL') {
                                 // ❌ DITOLAK - Sudah ambil hari ini
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
@@ -226,15 +226,14 @@
                                     color: '#ffffff',
                                     title: 'Pengambilan Ditolak!',
                                     html: `
-                                            <div class="text-start">
-                                                <strong>${res.data.nama}</strong><br>
-                                                <small>${res.data.nik}</small><br>
-                                                <hr class="my-1">
-                                                <small class="text-danger"><strong>${res.message}</strong></small><br>
-                                                <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
-                                                <small><strong>Batas: 1x per hari</strong></small>
-                                            </div>
-                                        `,
+                                        <div cLlass="text-start">
+                                            <strong>${res.data.nama}</strong><br>
+                                            <small>${res.data.nik}</small><br>
+                                            <hr class="my-1">
+                                            <small><strong>${res.message}</strong></small><br>
+                                            <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
+                                        </div>
+                                    `,
                                     customClass: {
                                         popup: 'text-white',
                                         title: 'text-white',
@@ -246,8 +245,7 @@
                                     $('#btnResetRFID').click();
                                     $('#tablePengambilan').DataTable().ajax.reload(null, false);
                                 }, 4000);
-
-                            } else if (xhr.status === 404) {
+                            } else if (res.error_code === 'TIDAK_TERDAFTAR_IDCARD') {
                                 // ❌ Kartu tidak ditemukan
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
@@ -256,7 +254,7 @@
                                     background: "#dc3545",
                                     color: '#ffffff',
                                     title: 'Kartu Tidak Terdaftar',
-                                    text: res.message || 'Kartu tidak ditemukan di sistem',
+                                    text: 'Kartu tidak ditemukan di sistem',
                                     customClass: {
                                         popup: 'text-white',
                                         title: 'text-white',
@@ -269,6 +267,28 @@
                                     $('#tablePengambilan').DataTable().ajax.reload(null, false);
                                 }, 2000);
 
+                            } else if (res.error_code === 'TIDAK_TERDAFTAR_PESERTA') {
+                                // ❌ Bukan Peserta
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
+
+                                Toast.fire({
+                                    icon: 'error',
+                                    background: "#dc3545",
+                                    color: '#ffffff',
+                                    title: 'Pengambilan Ditolak!',
+                                    text: "Anda tidak terdaftar sebagai peserta",
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
+                                });
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null,
+                                        false);
+                                }, 2000);
                             } else {
                                 // ❌ Error lainnya
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
@@ -279,9 +299,8 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Terjadi Kesalahan',
-                                    text: res?.message ||
-                                        'Terjadi kesalahan saat memproses data',
+                                    title: 'Gagal!',
+                                    text: 'Terjadi kesalahan saat memproses data',
                                     customClass: {
                                         popup: 'text-white',
                                         title: 'text-white',
@@ -291,7 +310,8 @@
 
                                 setTimeout(() => {
                                     $('#btnResetRFID').click();
-                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                    $('#tablePengambilan').DataTable().ajax.reload(null,
+                                        false);
                                 }, 2000);
                             }
                         },

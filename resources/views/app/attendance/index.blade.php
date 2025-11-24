@@ -199,6 +199,7 @@
 
                 if (cardValue !== '') {
                     $.ajax({
+                        // ajax getUser
                         url: '/attendance/user/' + cardValue,
                         type: 'GET',
                         dataType: 'json',
@@ -248,10 +249,10 @@
                                 error: function(xhr) {
                                     // error store
                                     console.error("error store: ", xhr.responseJSON);
-                                    if (xhr.status === 403) {
+                                    if (xhr.status === 409) {
                                         Toast.fire({
                                             icon: 'warning',
-                                            background: "#fd7e14",
+                                            background: "#dc3545",
                                             color: '#ffffff',
                                             title: 'Sudah Terdaftar!',
                                             text: 'Peserta sudah melakukan registrasi sebelumnya',
@@ -261,6 +262,19 @@
                                                 htmlContainer: 'text-white'
                                             }
                                         });
+                                    } else if (xhr.status === 404) {
+                                        Toast.fire({
+                                            icon: 'error',
+                                            background: "#dc3545",
+                                            color: '#ffffff',
+                                            title: 'Registrasi Ditolak!',
+                                            text: 'Anda tidak terdaftar sebagai peserta',
+                                            customClass: {
+                                                popup: 'text-white',
+                                                title: 'text-white',
+                                                htmlContainer: 'text-white'
+                                            }
+                                        })
                                     } else {
                                         Toast.fire({
                                             icon: 'error',
@@ -280,15 +294,16 @@
                             });
                         },
                         error: function(xhr) {
+                            // error getUser
                             console.error("error getUser: ", xhr.responseJSON);
 
                             if (xhr.status === 404) {
                                 Toast.fire({
                                     icon: 'warning',
-                                    background: "#fd7e14",
+                                    background: "#dc3545",
                                     color: '#ffffff',
                                     title: 'Tidak Ditemukan!',
-                                    text: 'Karyawan tidak terdaftar dalam sistem',
+                                    text: 'ID card tidak terdaftar dalam sistem',
                                     customClass: {
                                         popup: 'text-white',
                                         title: 'text-white',
@@ -296,6 +311,7 @@
                                     }
                                 })
                             } else {
+                                // 500
                                 Toast.fire({
                                     icon: 'error',
                                     background: "#dc3545",
@@ -378,7 +394,7 @@
                                     if (xhr.status === 403) {
                                         Toast.fire({
                                             icon: 'warning',
-                                            background: "#fd7e14",
+                                            background: "#dc3545",
                                             color: '#ffffff',
                                             title: 'Sudah Keluar!',
                                             text: 'Peserta sudah melakukan checkout sebelumnya',
@@ -390,7 +406,7 @@
                                         });
                                     } else if (xhr.status === 404) {
                                         Toast.fire({
-                                            background: "#fd7e14",
+                                            background: "#dc3545",
                                             color: '#ffffff',
                                             icon: 'warning',
                                             title: 'Tidak Ditemukan!',
@@ -402,6 +418,7 @@
                                             }
                                         });
                                     } else {
+                                        // 500
                                         Toast.fire({
                                             background: "#dc3545",
                                             color: '#ffffff',
@@ -427,10 +444,10 @@
                             if (xhr.status === 404) {
                                 Toast.fire({
                                     icon: 'warning',
-                                    background: "#fd7e14",
+                                    background: "#dc3545",
                                     color: '#ffffff',
                                     title: 'Tidak Ditemukan!',
-                                    text: 'Karyawan tidak terdaftar dalam sistem',
+                                    text: 'ID card tidak terdaftar dalam sistem',
                                     customClass: {
                                         popup: 'text-white',
                                         title: 'text-white',

@@ -2,16 +2,17 @@
 @section('title', 'Home')
 
 @section('content')
-    <div class="page-title-head d-flex align-items-center">
-        <div class="flex-grow-1">
-            <h4 class="fs-xl fw-bold m-0">Home</h4>
-        </div>
-    </div>
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid">
+        <div class="page-title-head d-flex align-items-center">
+            <div class="flex-grow-1">
+                <h4 class="fs-xl fw-bold m-0">Home</h4>
+            </div>
+        </div>
+
         <div class="row">
             <!-- Kehadiran -->
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
                 <a href="/attendance" class="text-decoration-none">
                     <div class="card shadow-sm hover-card">
                         <div class="card-body text-center py-4">
@@ -23,7 +24,7 @@
             </div>
 
             <!-- Pengambilan Makan -->
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
                 <a href="/pengambilan-makan" class="text-decoration-none">
                     <div class="card shadow-sm hover-card">
                         <div class="card-body text-center py-4">
@@ -35,7 +36,7 @@
             </div>
 
             <!-- Pengambilan Kaos -->
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
                 <a href="/pengambilan-kaos" class="text-decoration-none">
                     <div class="card shadow-sm hover-card">
                         <div class="card-body text-center py-4">
@@ -45,6 +46,21 @@
                     </div>
                 </a>
             </div>
+        </div>
+        <div class="row">
+            <h4 class="fs-xl fw-bold mb-2">Master Data</h4>
+
+            <div class="col-md-4">
+                <a href="/master/participants" class="text-decoration-none">
+                    <div class="card shadow-sm hover-card">
+                        <div class="card-body text-center py-4">
+                            <i class="bi bi-person-check fs-1 mb-2"></i>
+                            <h5 class="fw-bold">Peserta</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
         </div>
 
     </div>

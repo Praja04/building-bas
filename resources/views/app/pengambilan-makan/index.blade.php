@@ -72,7 +72,7 @@
                                         <!-- NIK -->
                                         <div class="col-md-12">
                                             <label class="form-label fw-semibold">
-                                                NIK <span class="text-danger">*</span>
+                                                NIK
                                             </label>
                                             <input type="text" class="form-control" name="nik" id="nik"
                                                 required readonly>
@@ -81,7 +81,7 @@
                                         <!-- Nama Pegawai -->
                                         <div class="col-md-12">
                                             <label class="form-label fw-semibold">
-                                                Nama Pegawai <span class="text-danger">*</span>
+                                                Nama Pegawai
                                             </label>
                                             <input type="text" class="form-control" name="nama_pegawai" id="nama_pegawai"
                                                 required readonly>
@@ -90,7 +90,7 @@
                                         <!-- Departemen -->
                                         <div class="col-md-12">
                                             <label class="form-label fw-semibold">
-                                                Departemen <span class="text-danger">*</span>
+                                                Departemen
                                             </label>
                                             <input type="text" class="form-control" name="departemen" id="departemen"
                                                 required readonly>
@@ -208,8 +208,8 @@
                         error: function(xhr) {
                             let res = xhr.responseJSON;
 
-                            if (xhr.error_code === 'SUDAH_AMBIL') {
-                                // ❌ DITOLAK - Sudah ambil hari ini
+                            if (res.error_code === 'SUDAH_AMBIL') {
+                                // ❌ DITOLAK - Sudah ambil 
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
                                 $('#nik').val(res.data.nik);
@@ -230,9 +230,8 @@
                                                 <strong>${res.data.nama}</strong><br>
                                                 <small>${res.data.nik}</small><br>
                                                 <hr class="my-1">
-                                                <small class="text-danger"><strong>${res.message}</strong></small><br>
+                                                <small><strong>${res.message}</strong></small><br>
                                                 <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
-                                                <small><strong>Batas: 1x per hari</strong></small>
                                             </div>
                                         `,
                                     customClass: {
@@ -247,7 +246,7 @@
                                     $('#tablePengambilan').DataTable().ajax.reload(null, false);
                                 }, 4000);
 
-                            } else if (xhr.error_code === 'BELUM_MASUK') {
+                            } else if (res.error_code === 'BELUM_MASUK') {
                                 // ❌ DITOLAK - Belum masuk
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
@@ -276,7 +275,36 @@
                                     $('#btnResetRFID').click();
                                     $('#tablePengambilan').DataTable().ajax.reload(null, false);
                                 }, 4000);
-                            } else if (xhr.status === 404) {
+                            } else if (res.error_code === 'TIDAK_TERDAFTAR_PESERTA') {
+                                // ❌ DITOLAK - Bukan Participants
+                                playSound("{{ asset('assets/sound/failed.mp3') }}");
+
+                                $('#nik').val(res.data.nik);
+                                $('#nama_pegawai').val(res.data.nama);
+                                $('#departemen').val(res.data.departemen || '');
+
+                                if (res.data.foto) {
+                                    $('#fotoPegawai').attr('src', res.data.foto);
+                                }
+
+                                Toast.fire({
+                                    icon: 'error',
+                                    background: "#dc3545",
+                                    color: '#ffffff',
+                                    title: 'Pengambilan Ditolak!',
+                                    text: "Anda tidak terdaftar sebagai peserta!",
+                                    customClass: {
+                                        popup: 'text-white',
+                                        title: 'text-white',
+                                        htmlContainer: 'text-white'
+                                    }
+                                });
+
+                                setTimeout(() => {
+                                    $('#btnResetRFID').click();
+                                    $('#tablePengambilan').DataTable().ajax.reload(null, false);
+                                }, 4000);
+                            } else if (res.errpr_code === 'TIDAK_TERDAFTAR_IDCARD') {
                                 // ❌ Kartu tidak ditemukan
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 

@@ -1,10 +1,17 @@
 <?php
 
+use App\Http\Controllers\ParticipantController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
    return view('home');
 });
+
+Route::get('/test', function () {
+   return view('test');
+});
+
+Route::post('/download-excel', [ParticipantController::class, 'downloadExcel']);
 
 Route::prefix('penitipan-barang')->group(function () {
    Route::get('/', [App\Http\Controllers\PenitipanBarangController::class, 'index'])->name('penitipan-barang.index');
@@ -32,4 +39,14 @@ Route::prefix('pengambilan-kaos')->group(function () {
    Route::get('/', [App\Http\Controllers\PengambilanKaosController::class, 'index'])->name('pengambilan-kaos.index');
    Route::get('/get-by-card/{cardnodevice}', [App\Http\Controllers\PengambilanKaosController::class, 'getByCard'])->name('pengambilan-kaos.getByCard');
    Route::post('/ambil/{id}', [App\Http\Controllers\PengambilanKaosController::class, 'ambil'])->name('pengambilan-kaos.ambil');
+});
+
+Route::prefix('master')->group(function () {
+   Route::delete('/participants/destroy-all', [App\Http\Controllers\ParticipantController::class, 'destroyAll'])->name('participants.destroyAll'); // jangan dipindahin urutannya
+   Route::post('/participants/import', [App\Http\Controllers\ParticipantController::class, 'import'])->name('participants.import');
+   Route::post('/participants/bulk-delete', [App\Http\Controllers\ParticipantController::class, 'bulkDelete'])->name('participants.bulkDelete');
+   Route::resource('participants', App\Http\Controllers\ParticipantController::class);
+
+   // todo: event
+   // Route::resource('events', EventController::class);
 });
