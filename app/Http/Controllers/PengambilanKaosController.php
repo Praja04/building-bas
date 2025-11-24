@@ -63,6 +63,7 @@ class PengambilanKaosController extends Controller
                 }
             }
 
+
             // cari di table participant
             if (!$data) {
                 $peserta = Participant::where('nik', $input)->first();
@@ -86,11 +87,9 @@ class PengambilanKaosController extends Controller
                 ], 404);
             }
 
-            // delete 0 di depan
-            $normalizedNik = ltrim($data->nik, '0');
 
             // Cek apakah peserta terdaftar di tabel participants
-            $peserta = Participant::where('nik', $normalizedNik)->first();
+            $peserta = Participant::where('nik', $data->nik)->first();
 
             if (!$peserta) {
                 return response()->json([
@@ -131,7 +130,7 @@ class PengambilanKaosController extends Controller
             // SIMPAN DATA PENGAMBILAN KAOS (First time today)
             $pengambilan = PengambilanKaos::create([
                 'cardnodevice' => $input,
-                'nik' => $normalizedNik,
+                'nik' => $data->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
                 'waktu_ambil' => now(),
