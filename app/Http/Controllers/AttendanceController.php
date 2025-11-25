@@ -56,7 +56,7 @@ class AttendanceController extends Controller
             // --- 1. Cari berdasarkan CARDNODEVICE ---
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen')
+                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
                 ->where('CARDNODEVICE', $input)
                 ->first();
 
@@ -64,12 +64,35 @@ class AttendanceController extends Controller
             if (!$data) {
                 $data = DB::connection('192.168.178.44-admin')
                     ->table('MSIDCARD')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
                     ->where('NIK', $input)
                     ->first();
+
+                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
+                // if (!$data && !str_starts_with($input, '0')) {
+
+                //     $data = DB::connection('192.168.178.44-admin')
+                //         ->table('MSIDCARD')
+                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
+                //         ->where('NIK', '0' . $input)
+                //         ->first();
+                // }
             }
 
-            // --- 3. Jika dua-duanya tidak ditemukan ---
+            // last option: cari di table participants
+            if (!$data) {
+                $peserta = Participant::where('nik', $input)->first();
+
+                if ($peserta) {
+                    $data = (object)[
+                        'nik'        => $peserta->nik,
+                        'nama'       => $peserta->nama,
+                        'departemen' => $peserta->departemen,
+                    ];
+                }
+            }
+
+            // Jika masih tidak ada, return tidak ditemukan
             if (!$data) {
                 return response()->json([
                     'status' => 'error',
@@ -89,7 +112,7 @@ class AttendanceController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan server.'
+                'message' => 'Terjadi kesalahan server.' . $e->getMessage()
             ], 500);
         }
     }

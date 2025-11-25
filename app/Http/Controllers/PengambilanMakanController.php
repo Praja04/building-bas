@@ -42,7 +42,7 @@ class PengambilanMakanController extends Controller
             // 1️. CARI BERDASARKAN CARDNODEVICE
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 ->where('CARDNODEVICE', $input)
                 ->first();
 
@@ -50,9 +50,33 @@ class PengambilanMakanController extends Controller
             if (!$data) {
                 $data = DB::connection('192.168.178.44-admin')
                     ->table('MSIDCARD')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
                     ->first();
+
+                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
+                // if (!$data && !str_starts_with($input, '0')) {
+
+                //     $data = DB::connection('192.168.178.44-admin')
+                //         ->table('MSIDCARD')
+                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
+                //         ->where('NIK', '0' . $input)
+                //         ->first();
+                // }
+            }
+
+            // last option: cari di table participants
+            if (!$data) {
+                $peserta = Participant::where('nik', $input)->first();
+
+                if ($peserta) {
+                    $data = (object)[
+                        'nik'        => $peserta->nik,
+                        'nama'       => $peserta->nama,
+                        'departemen' => $peserta->departemen,
+                        'foto'       => null
+                    ];
+                }
             }
 
             // JIKA MASIH TIDAK ADA → RETURN TIDAK TERDAFTAR
@@ -103,6 +127,7 @@ class PengambilanMakanController extends Controller
             // VALIDASI PENGAMBILAN (hanya boleh 1 kali)
             $today = Carbon::today();
             $pengambilanHariIni = PengambilanMakan::where('cardnodevice', $input)
+                ->orWhere('nik', $data->nik)
                 ->whereDate('waktu_ambil', $today)
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();
@@ -148,7 +173,7 @@ class PengambilanMakanController extends Controller
 
             // SIMPAN DATA PENGAMBILAN MAKAN (First time today)
             $pengambilan = PengambilanMakan::create([
-                'cardnodevice' => $input,
+                'cardnodevice' => $data->cardnodevice ?? "0",
                 'nik' => $data->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,

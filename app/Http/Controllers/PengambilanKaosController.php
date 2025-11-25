@@ -40,7 +40,7 @@ class PengambilanKaosController extends Controller
             // 1️. CARI BERDASARKAN CARDNODEVICE
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 ->where('CARDNODEVICE', $input)
                 ->first();
 
@@ -48,23 +48,22 @@ class PengambilanKaosController extends Controller
             if (!$data) {
                 $data = DB::connection('192.168.178.44-admin')
                     ->table('MSIDCARD')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
                     ->first();
 
-                // // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
+                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
                 // if (!$data && !str_starts_with($input, '0')) {
 
                 //     $data = DB::connection('192.168.178.44-admin')
                 //         ->table('MSIDCARD')
-                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 //         ->where('NIK', '0' . $input)
                 //         ->first();
                 // }
             }
 
-
-            // cari di table participant
+            // last option: cari di table participants
             if (!$data) {
                 $peserta = Participant::where('nik', $input)->first();
 
@@ -105,7 +104,7 @@ class PengambilanKaosController extends Controller
             }
 
             // VALIDASI PENGAMBILAN HANYA 1 KALI
-            $pengambilanSebelumnya = PengambilanKaos::where('cardnodevice', $input)->first();
+            $pengambilanSebelumnya = PengambilanKaos::where('cardnodevice', $input)->orWhere('nik', $data->nik)->first();
 
             // Jika sudah pernah ambil, TOLAK
             if ($pengambilanSebelumnya) {
@@ -128,7 +127,7 @@ class PengambilanKaosController extends Controller
 
             // SIMPAN DATA PENGAMBILAN KAOS (First time today)
             $pengambilan = PengambilanKaos::create([
-                'cardnodevice' => $input,
+                'cardnodevice' => $data->cardnodevice ?? '0',
                 'nik' => $data->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
