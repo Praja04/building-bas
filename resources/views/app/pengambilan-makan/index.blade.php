@@ -115,7 +115,7 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th width="5%">#</th>
-                                        <th>ID Card</th>
+                                        {{-- <th>ID Card</th> --}}
                                         <th>NIK</th>
                                         <th>Nama</th>
                                         <th>Departemen</th>
@@ -378,10 +378,10 @@
                         orderable: false,
                         searchable: false
                     },
-                    {
-                        data: 'cardnodevice',
-                        name: 'cardnodevice'
-                    },
+                    // {
+                    //     data: 'cardnodevice',
+                    //     name: 'cardnodevice'
+                    // },
                     {
                         data: 'nik',
                         name: 'nik'

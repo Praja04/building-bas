@@ -221,7 +221,7 @@
                                     nik: res.data.nik,
                                     nama_pegawai: res.data.nama,
                                     departemen: res.data.departemen,
-                                    cardnodevice: cardValue,
+                                    cardnodevice: res.data.cardnodevice ?? "0",
                                     _token: $('meta[name="csrf-token"]').attr('content')
                                 },
                                 success: function(response) {
