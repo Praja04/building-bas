@@ -38,16 +38,21 @@ class ParticipantsImport implements ToModel, WithHeadingRow
         }
 
         // NIK already exists 
+        // if (Participant::where('nik', $nik)->exists()) {
+        //     throw new \Exception(json_encode([
+        //         'error' => 'DuplicateData',
+        //         'message' => 'NIK sudah terdaftar',
+        //         'data' => [
+        //             'nik' => $nik,
+        //             'nama' => $nama,
+        //             'departemen' => $departemen,
+        //         ],
+        //     ]));
+        // }
+
+        // skip if NIK already exists
         if (Participant::where('nik', $nik)->exists()) {
-            throw new \Exception(json_encode([
-                'error' => 'DuplicateData',
-                'message' => 'NIK sudah terdaftar',
-                'data' => [
-                    'nik' => $nik,
-                    'nama' => $nama,
-                    'departemen' => $departemen,
-                ],
-            ]));
+            return null;
         }
 
         return new Participant([
