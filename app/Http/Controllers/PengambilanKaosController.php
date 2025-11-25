@@ -52,15 +52,15 @@ class PengambilanKaosController extends Controller
                     ->where('NIK', $input)
                     ->first();
 
-                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
-                if (!$data && !str_starts_with($input, '0')) {
+                // // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
+                // if (!$data && !str_starts_with($input, '0')) {
 
-                    $data = DB::connection('192.168.178.44-admin')
-                        ->table('MSIDCARD')
-                        ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
-                        ->where('NIK', '0' . $input)
-                        ->first();
-                }
+                //     $data = DB::connection('192.168.178.44-admin')
+                //         ->table('MSIDCARD')
+                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'FOTOBLOB as foto')
+                //         ->where('NIK', '0' . $input)
+                //         ->first();
+                // }
             }
 
 
@@ -86,7 +86,6 @@ class PengambilanKaosController extends Controller
                     'message' => 'Data tidak ditemukan, kartu atau NIK tidak terdaftar!'
                 ], 404);
             }
-
 
             // Cek apakah peserta terdaftar di tabel participants
             $peserta = Participant::where('nik', $data->nik)->first();
