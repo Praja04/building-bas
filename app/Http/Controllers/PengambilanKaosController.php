@@ -42,7 +42,12 @@ class PengambilanKaosController extends Controller
                 ->table('MSIDCARD')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 ->where('CARDNODEVICE', $input)
+                ->where('STATUS', 'X') // active
+                ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
                 ->first();
+
+            // dd($data);
+
 
             // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK 
             if (!$data) {
@@ -50,6 +55,8 @@ class PengambilanKaosController extends Controller
                     ->table('MSIDCARD')
                     ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
+                    ->where('STATUS', 'X') // active
+                    ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
                     ->first();
 
                 // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
@@ -64,6 +71,7 @@ class PengambilanKaosController extends Controller
             }
 
             // last option: cari di table participants
+            // note: untuk PT PAS akan cari data di sini
             if (!$data) {
                 $peserta = Participant::where('nik', $input)->first();
 
