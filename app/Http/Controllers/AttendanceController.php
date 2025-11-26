@@ -58,6 +58,8 @@ class AttendanceController extends Controller
                 ->table('MSIDCARD')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
                 ->where('CARDNODEVICE', $input)
+                ->where('STATUS', 'X') // active
+                ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
                 ->first();
 
             // --- 2. Jika tidak ditemukan → cari berdasarkan NIK ---
@@ -66,6 +68,8 @@ class AttendanceController extends Controller
                     ->table('MSIDCARD')
                     ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
                     ->where('NIK', $input)
+                    ->where('STATUS', 'X') // active
+                    ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
                     ->first();
 
                 // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan

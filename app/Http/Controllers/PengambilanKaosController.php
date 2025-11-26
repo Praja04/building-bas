@@ -46,9 +46,6 @@ class PengambilanKaosController extends Controller
                 ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
                 ->first();
 
-            // dd($data);
-
-
             // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK 
             if (!$data) {
                 $data = DB::connection('192.168.178.44-admin')
