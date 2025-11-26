@@ -24,6 +24,10 @@ class AttendanceController extends Controller
             $attendances = Attendance::query()
                 ->orderByDesc('created_at');
 
+            if ($request->filled('is_doorprize')) {
+                $attendances->where('is_doorprize', $request->is_doorprize);
+            }
+
             return DataTables::of($attendances)
                 ->addIndexColumn()
                 ->editColumn('jam_masuk_formatted', function ($row) {
@@ -35,9 +39,9 @@ class AttendanceController extends Controller
                         ? date('d M Y H:i', strtotime($row->jam_keluar)) : '-';
                 })
                 ->addColumn('status_doorprize', function ($row) {
-                    if ($row->is_doorprize === 1) {
+                    if ($row->is_doorprize == 1) {
                         return '<span class="badge bg-success">Ya</span>';
-                    } elseif ($row->is_doorprize === 0) {
+                    } elseif ($row->is_doorprize == 0) {
                         return '<span class="badge bg-danger">Tidak</span>';
                     } else {
                         return '<span class="badge bg-secondary">Belum Ditentukan</span>';

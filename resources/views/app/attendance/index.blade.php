@@ -164,10 +164,19 @@
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h6 class="mb-0 fw-semibold">Data Peserta</h6>
                     <button id="btnExportExcel" class="btn btn-success btn-sm">
-                        Export Excel
+                        Export Excel <br> (Layak Doorprize)
                     </button>
                 </div>
                 <div class="card-body">
+                    <div class="mb-3">
+                        <h6>Filter Doorprize</h6>
+                        <select id="filterDoorprize" class="form-select" style="width: 200px;">
+                            <option value="">Semua</option>
+                            <option value="1">Layak Doorprize</option>
+                            <option value="0">Tidak Layak</option>
+                        </select>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover align-middle" id="tableAttendance">
                             <thead class="table-light">
@@ -514,7 +523,13 @@
             $('#tableAttendance').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('attendance.index') }}",
+                ajax: {
+                    url: "{{ route('attendance.index') }}",
+                    data: function(d) {
+                        let val = $('#filterDoorprize').val();
+                        d.is_doorprize = (val === '' ? null : val);
+                    }
+                },
                 columns: [{
                         data: 'DT_RowIndex',
                         name: 'DT_RowIndex',
@@ -551,6 +566,11 @@
             });
 
             $('#data-tab').on('click', function() {
+                $('#tableAttendance').DataTable().ajax
+                    .reload()
+            });
+
+            $('#filterDoorprize').change(function() {
                 $('#tableAttendance').DataTable().ajax
                     .reload()
             });
