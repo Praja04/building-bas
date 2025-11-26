@@ -106,8 +106,11 @@
             {{-- TAB DATA --}}
             <div class="tab-pane fade" id="dataTab" role="tabpanel">
                 <div class="card shadow-sm">
-                    <div class="card-header bg-light">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
                         <h6 class="mb-0 fw-semibold">Data Pengambilan Kaos</h6>
+                        <button id="btnExportExcel" class="btn btn-success btn-sm">
+                            Export Excel
+                        </button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -377,6 +380,24 @@
             $('#form-tab').on('click', function() {
                 $('#cardnodevice').focus();
             });
+
+            $('#btnExportExcel').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Export Data',
+                    text: 'File Excel sedang diproses...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                        window.location.href = "{{ route('pengambilan-kaos.export') }}";
+                    }
+                });
+                setTimeout(() => Swal.close(), 1500);
+            });
+
         });
     </script>
 @endsection

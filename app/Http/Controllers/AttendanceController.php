@@ -256,7 +256,7 @@ class AttendanceController extends Controller
     public function export()
     {
         try {
-            $fileName = 'attendance_' . now()->format('Ymd_His') . '.xlsx';
+            $fileName = 'kehadiran_' . now()->format('Ymd_His') . '.xlsx';
             return Excel::download(new AttendanceExport, $fileName);
         } catch (\Exception $e) {
             Log::error('[AttendanceController export]', [

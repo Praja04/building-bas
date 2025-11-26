@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PengambilanMakanExport;
 use App\Models\Attendance;
 use App\Models\Participant;
 use App\Models\PengambilanMakan;
@@ -9,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 
 class PengambilanMakanController extends Controller
@@ -227,6 +229,23 @@ class PengambilanMakanController extends Controller
             return 'data:image/jpeg;base64,' . base64_encode(stream_get_contents($blob));
         } else {
             return 'data:image/jpeg;base64,' . base64_encode($blob);
+        }
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'pengambilan_makan_' . now()->format('Ymd_His') . '.xlsx';
+            return Excel::download(new PengambilanMakanExport, $fileName);
+        } catch (\Exception $e) {
+            Log::error('[PengambilanMakanController export]', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal export data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

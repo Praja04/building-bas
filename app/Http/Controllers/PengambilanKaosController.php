@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PengambilanKaosExport;
 use App\Models\Participant;
 use App\Models\PengambilanKaos;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\DataTables;
 
 class PengambilanKaosController extends Controller
@@ -170,6 +173,23 @@ class PengambilanKaosController extends Controller
             return 'data:image/jpeg;base64,' . base64_encode(stream_get_contents($blob));
         } else {
             return 'data:image/jpeg;base64,' . base64_encode($blob);
+        }
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'pengambilan_kaos_' . now()->format('Ymd_His') . '.xlsx';
+            return Excel::download(new PengambilanKaosExport, $fileName);
+        } catch (\Exception $e) {
+            Log::error('[PengambilanKaosController export]', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal export data: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
