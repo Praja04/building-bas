@@ -580,16 +580,30 @@
 
                 Swal.fire({
                     title: 'Export Data',
-                    text: 'File Excel sedang diproses...',
+                    text: 'Sedang memproses export...',
                     icon: 'info',
                     showConfirmButton: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.ajax({
+                    url: "{{ route('attendance.export') }}",
+                    type: "GET",
+                    success: function() {
+                        Swal.close();
                         window.location.href = "{{ route('attendance.export') }}";
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: "Gagal export data kehadiran peserta. Silakan coba lagi."
+                        });
                     }
                 });
-                setTimeout(() => Swal.close(), 1500);
             });
 
         });

@@ -25,6 +25,7 @@
                 <div class="d-flex justify-content-end gap-2 flex-wrap flex-md-nowrap">
                     <button class="btn btn-warning btn-sm d-none w-100 w-sm-auto" id="btnDeleteSelected">Hapus (0)</button>
                     <button class="btn btn-danger btn-sm w-100 w-sm-auto" id="btnDeleteAll">Hapus Semua</button>
+                    <button class="btn btn-info btn-sm w-100 w-sm-auto" id="btnExport">Export Excel</button>
                     <button class="btn btn-success btn-sm w-100 w-sm-auto" id="btnImportOpen">Import Excel</button>
                     <button class="btn btn-primary btn-sm w-100 w-sm-auto" id="btnAddPeserta">+ Tambah Peserta</button>
                 </div>
@@ -594,9 +595,38 @@
                         });
                     }
                 });
-
             });
 
+            $('#btnExport').click(function(e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Export Data',
+                    text: 'Sedang memproses export...',
+                    icon: 'info',
+                    showConfirmButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.ajax({
+                    url: "{{ route('participants.export') }}",
+                    type: "GET",
+                    success: function() {
+                        Swal.close();
+                        window.location.href = "{{ route('participants.export') }}";
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: "Gagal export data peserta. Silakan coba lagi."
+                        });
+                    }
+                });
+            });
         });
     </script>
 @endsection

@@ -418,21 +418,36 @@
                 $('#cardnodevice').focus();
             });
 
+
             $('#btnExportExcel').click(function(e) {
                 e.preventDefault();
 
                 Swal.fire({
                     title: 'Export Data',
-                    text: 'File Excel sedang diproses...',
+                    text: 'Sedang memproses export...',
                     icon: 'info',
                     showConfirmButton: false,
                     allowOutsideClick: false,
-                    didOpen: () => {
-                        Swal.showLoading();
+                    didOpen: () => Swal.showLoading()
+                });
+
+                $.ajax({
+                    url: "{{ route('pengambilan-makan.export') }}",
+                    type: "GET",
+                    success: function() {
+                        Swal.close();
                         window.location.href = "{{ route('pengambilan-makan.export') }}";
+                    },
+                    error: function(xhr) {
+                        Swal.close();
+
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: "Gagal export data pengambilan makan. Silakan coba lagi."
+                        });
                     }
                 });
-                setTimeout(() => Swal.close(), 1500);
             });
         });
     </script>
