@@ -44,11 +44,19 @@ Route::prefix('pengambilan-kaos')->group(function () {
 });
 
 Route::prefix('master')->group(function () {
-   Route::delete('/participants/destroy-all', [App\Http\Controllers\ParticipantController::class, 'destroyAll'])->name('participants.destroyAll'); // jangan dipindahin urutannya
-   Route::post('/participants/import', [App\Http\Controllers\ParticipantController::class, 'import'])->name('participants.import');
-   Route::post('/participants/bulk-delete', [App\Http\Controllers\ParticipantController::class, 'bulkDelete'])->name('participants.bulkDelete');
-   Route::resource('participants', App\Http\Controllers\ParticipantController::class);
 
-   // todo: event
-   // Route::resource('events', EventController::class);
+   Route::prefix('participants')->group(function () {
+      Route::delete('/destroy-all', [App\Http\Controllers\ParticipantController::class, 'destroyAll'])
+         ->name('participants.destroyAll'); // jangan dipindahin urutannya
+      Route::post('/import', [App\Http\Controllers\ParticipantController::class, 'import'])
+         ->name('participants.import');
+      Route::post('/bulk-delete', [App\Http\Controllers\ParticipantController::class, 'bulkDelete'])
+         ->name('participants.bulkDelete');
+
+      Route::get('/export', [App\Http\Controllers\ParticipantController::class, 'export'])
+         ->name('participants.export');
+      Route::resource('/', App\Http\Controllers\ParticipantController::class)
+         ->parameters(['' => 'participant'])
+         ->names('participants');
+   });
 });

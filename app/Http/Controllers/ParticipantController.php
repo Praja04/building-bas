@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\KaryawanExport;
+use App\Exports\ParticipantExport;
 use App\Imports\ParticipantsImport;
 use App\Models\Participant;
 use Illuminate\Http\Request;
@@ -23,7 +24,7 @@ class ParticipantController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $participants = Participant::query();
+            $participants = Participant::orderBy('nama', 'asc');
 
             return DataTables::of($participants)
                 ->addIndexColumn()
@@ -384,5 +385,22 @@ class ParticipantController extends Controller
         }
 
         return Excel::download(new KaryawanExport($finalData), 'data_karyawan.xlsx');
+    }
+
+    public function export()
+    {
+        try {
+            $fileName = 'peserta_' . now()->format('Ymd_His') . '.xlsx';
+            return Excel::download(new ParticipantExport, $fileName);
+        } catch (\Exception $e) {
+            Log::error('[ParticipantController export]', [
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal export data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
