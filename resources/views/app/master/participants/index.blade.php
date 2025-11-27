@@ -1,7 +1,6 @@
 @extends('layouts.component.main')
 @section('title', 'Data Peserta')
 @section('content')
-
     <div class="container-fluid">
         <div class="page-title-head d-flex align-items-center mb-0 pb-0">
             <div class="flex-grow-1">

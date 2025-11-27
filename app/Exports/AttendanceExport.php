@@ -45,7 +45,7 @@ class AttendanceExport implements FromCollection, WithHeadings, WithMapping, Wit
         return [
             $this->rowNumber,
             $attendance->nik,
-            $attendance->nama_pegawai,
+            $attendance->nama_pegawai . ' (' . $attendance->departemen . ')',
             $attendance->departemen,
             $attendance->jam_masuk,
             $attendance->jam_keluar ?? "Belum Keluar",

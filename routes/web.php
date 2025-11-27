@@ -59,4 +59,10 @@ Route::prefix('master')->group(function () {
          ->parameters(['' => 'participant'])
          ->names('participants');
    });
+
+   Route::prefix('msid')->group(function () {
+      Route::get('/', [App\Http\Controllers\MsidController::class, 'index'])->name('msid.index');
+      Route::get('/{id}', [App\Http\Controllers\MsidController::class, 'edit'])->name('msid.edit');
+      Route::post('/{id}', [App\Http\Controllers\MsidController::class, 'update'])->name('msid.update');
+   });
 });
