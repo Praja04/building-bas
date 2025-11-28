@@ -320,6 +320,8 @@
                         $('#nik').val(res.nik);
                         $('#departemen').val(res.departemen);
                         $('#nik2').val(res.nik2);
+                        $('#cardnodevice1').val(res.cardnodevice1);
+                        $('#cardnodevice2').val(res.cardnodevice2);
                         modalPeserta.show();
                     },
                     error: function(xhr) {
