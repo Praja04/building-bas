@@ -57,50 +57,80 @@ class AttendanceController extends Controller
     public function getUser($input)
     {
         try {
-            // --- 1. Cari berdasarkan CARDNODEVICE ---
+            $data = null;
+
+            // ========================================
+            // LANGKAH 1: Cek di tabel MSIDCARD berdasarkan CARDNODEVICE
+            // ========================================
             $data = DB::connection('192.168.178.44-admin')
                 ->table('MSIDCARD')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
                 ->where('CARDNODEVICE', $input)
                 ->where('STATUS', 'X') // active
-                ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
+                ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
                 ->first();
 
-            // --- 2. Jika tidak ditemukan → cari berdasarkan NIK ---
+            // ========================================
+            // LANGKAH 2: Jika tidak ditemukan, cek di tabel participants berdasarkan CARDNODEVICE
+            // ========================================
             if (!$data) {
-                $data = DB::connection('192.168.178.44-admin')
-                    ->table('MSIDCARD')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
-                    ->where('NIK', $input)
-                    ->where('STATUS', 'X') // active
-                    ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
-                    ->first();
+                // Cek cardnodevice1 terlebih dahulu
+                $peserta = Participant::where('cardnodevice1', $input)->first();
 
-                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
-                // if (!$data && !str_starts_with($input, '0')) {
+                // Jika tidak ada, cek cardnodevice2
+                if (!$peserta) {
+                    $peserta = Participant::where('cardnodevice2', $input)->first();
+                }
 
-                //     $data = DB::connection('192.168.178.44-admin')
-                //         ->table('MSIDCARD')
-                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
-                //         ->where('NIK', '0' . $input)
-                //         ->first();
-                // }
-            }
-
-            // last option: cari di table participants
-            if (!$data) {
-                $peserta = Participant::where('nik', $input)->first();
-
+                // Jika ditemukan, format data
                 if ($peserta) {
                     $data = (object)[
                         'nik'        => $peserta->nik,
                         'nama'       => $peserta->nama,
                         'departemen' => $peserta->departemen,
+                        'cardnodevice' => $input // cardnodevice yang digunakan
                     ];
                 }
             }
 
-            // Jika masih tidak ada, return tidak ditemukan
+            // ========================================
+            // LANGKAH 3: Jika masih tidak ditemukan, cek berdasarkan NIK
+            // ========================================
+            if (!$data) {
+                // 3a. Cek NIK di tabel MSIDCARD
+                $data = DB::connection('192.168.178.44-admin')
+                    ->table('MSIDCARD')
+                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
+                    ->where('NIK', $input)
+                    ->where('STATUS', 'X') // active
+                    ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
+                    ->first();
+
+                // 3b. Jika tidak ada, cek NIK dan NIK2 di tabel participants
+                if (!$data) {
+                    // Cek NIK terlebih dahulu
+                    $peserta = Participant::where('nik', $input)->first();
+
+                    // Jika tidak ada, cek NIK2
+                    if (!$peserta) {
+                        $peserta = Participant::where('nik2', $input)->first();
+                    }
+
+                    // Jika ditemukan, format data
+                    if ($peserta) {
+                        $data = (object)[
+                            'nik'        => $peserta->nik,
+                            'nama'       => $peserta->nama,
+                            'departemen' => $peserta->departemen,
+                            'cardnodevice' => $peserta->cardnodevice1 ?? $peserta->cardnodevice2 // ambil cardnodevice yang tersedia
+                        ];
+                    }
+                }
+            }
+
+            // ========================================
+            // HASIL AKHIR
+            // ========================================
             if (!$data) {
                 return response()->json([
                     'status' => 'error',
@@ -120,7 +150,7 @@ class AttendanceController extends Controller
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Terjadi kesalahan server.' . $e->getMessage()
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
             ], 500);
         }
     }

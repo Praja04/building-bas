@@ -24,10 +24,12 @@
                         <thead class="table-light">
                             <tr>
                                 <th width="5%">#</th>
+                                <th>Changed On</th>
                                 <th>NIK</th>
                                 <th>Nama</th>
                                 <th>Card ID</th>
                                 <th>Departemen</th>
+                                <th>Status</th>
                                 <th width="10%">Aksi</th>
                             </tr>
                         </thead>
@@ -105,6 +107,10 @@
                         searchable: false,
                     },
                     {
+                        data: 'changed_on',
+                        name: 'changed_on',
+                    },
+                    {
                         data: 'nik',
                         name: 'nik',
                     },
@@ -120,6 +126,10 @@
                     {
                         data: 'departemen',
                         name: 'departemen'
+                    },
+                    {
+                        data: 'status',
+                        name: 'status'
                     },
                     {
                         data: null,

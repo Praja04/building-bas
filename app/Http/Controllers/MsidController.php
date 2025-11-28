@@ -18,7 +18,9 @@ class MsidController extends Controller
                     'EMPNM as nama',
                     'CARDNODEVICE as card_id',
                     'DEPTID as departemen',
-                    'EMPCARDID as id'
+                    'EMPCARDID as id',
+                    'STATUS as status',
+                    'CHANGEDON as changed_on'
                 )
                 ->where('STATUS', 'X')
                 ->orderBy('EMPNM', 'ASC')
@@ -26,6 +28,12 @@ class MsidController extends Controller
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('status', function ($row) {
+                    return $row->status == 'X' ? 'Aktif' : 'Non-Aktif';
+                })
+                ->addColumn('changed_on', function ($row) {
+                    return $row->changed_on ? date('d-m-Y H:i:s', strtotime($row->changed_on)) : '-';
+                })
                 ->make(true);
         }
         return view('app.master.msid.index');

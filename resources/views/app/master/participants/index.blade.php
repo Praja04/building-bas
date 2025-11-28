@@ -86,8 +86,8 @@
                             </div>
 
                             <div class="col-lg-6">
-                                <label class="form-label">Card No. Device 1 <span class="text-danger">*</span></label>
-                                <input type="text" id="cardnodevice1" class="form-control" required
+                                <label class="form-label">Card No. Device 1</label>
+                                <input type="text" id="cardnodevice1" class="form-control"
                                     placeholder="Card No. Device 1">
                             </div>
 
@@ -177,6 +177,10 @@
                 ajax: "{{ route('participants.index') }}",
                 processing: true,
                 serverSide: true,
+                lengthMenu: [
+                    [10, 25, 50, 100, 250, 500, -1],
+                    [10, 25, 50, 100, 250, 500, "All"]
+                ],
                 columns: [{
                         // data: 'DT_RowIndex',
                         data: 'id',
