@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::table('participants', function (Blueprint $table) {
             $table->string('nik2')->nullable()->after('nik');
-            // $table->string('cardnodevice1')->nullable()->after('nik2');
-            // $table->string('cardnodevice2')->nullable()->after('cardnodevice1');
+            $table->string('cardnodevice1')->nullable()->after('nik2');
+            $table->string('cardnodevice2')->nullable()->after('cardnodevice1');
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
     {
         Schema::table('participants', function (Blueprint $table) {
             $table->dropColumn('nik2');
-            // $table->dropColumn('cardnodevice1');
-            // $table->dropColumn('cardnodevice2');
+            $table->dropColumn('cardnodevice1');
+            $table->dropColumn('cardnodevice2');
         });
     }
 };

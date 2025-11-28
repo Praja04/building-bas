@@ -43,6 +43,8 @@
                                 <th>No.</th>
                                 <th>NIK</th>
                                 <th>NIK 2</th>
+                                <th>Card No. Device 1</th>
+                                <th>Card No. Device 2</th>
                                 <th>Nama Peserta</th>
                                 <th>Departemen</th>
                                 <th>Aksi</th>
@@ -59,7 +61,7 @@
 
     {{-- MODAL ADD / EDIT EVENT --}}
     <div class="modal fade" id="modalPeserta" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -72,33 +74,48 @@
 
                         <input type="hidden" id="peserta_id">
 
-                        <div class="mb-3">
-                            <label class="form-label">NIK <span class="text-danger">*</span></label>
-                            <input type="text" id="nik" class="form-control" required placeholder="NIK">
-                        </div>
+                        <div class="row g-3">
+                            <div class="col-lg-6">
+                                <label class="form-label">NIK <span class="text-danger">*</span></label>
+                                <input type="text" id="nik" class="form-control" required placeholder="NIK">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">NIK 2 <span class="text-danger">*</span></label>
-                            <input type="text" id="nik2" class="form-control" required placeholder="NIK 2">
-                        </div>
+                            <div class="col-lg-6">
+                                <label class="form-label">NIK 2</label>
+                                <input type="text" id="nik2" class="form-control" placeholder="NIK 2">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Nama Peserta <span class="text-danger">*</span></label>
-                            <input type="text" id="nama" class="form-control" required placeholder="Nama Peserta">
-                        </div>
+                            <div class="col-lg-6">
+                                <label class="form-label">Card No. Device 1 <span class="text-danger">*</span></label>
+                                <input type="text" id="cardnodevice1" class="form-control" required
+                                    placeholder="Card No. Device 1">
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Departemen <span class="text-danger">*</span></label>
-                            <input type="text" id="departemen" class="form-control" required placeholder="Departemen">
-                        </div>
+                            <div class="col-lg-6">
+                                <label class="form-label">Card No. Device 2</label>
+                                <input type="text" id="cardnodevice2" class="form-control"
+                                    placeholder="Card No. Device 2">
+                            </div>
 
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-primary" id="btnSavePeserta" type="submit">Simpan</button>
-                            <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Batal</button>
+                            <div class="col-lg-6">
+                                <label class="form-label">Nama Peserta <span class="text-danger">*</span></label>
+                                <input type="text" id="nama" class="form-control" required
+                                    placeholder="Nama Peserta">
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label">Departemen <span class="text-danger">*</span></label>
+                                <input type="text" id="departemen" class="form-control" required
+                                    placeholder="Departemen">
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-light" data-bs-dismiss="modal" type="button">Batal</button>
+                                <button class="btn btn-primary" id="btnSavePeserta" type="submit">Simpan</button>
+                            </div>
                         </div>
                     </form>
                 </div>
-
             </div>
         </div>
     </div>
@@ -130,7 +147,8 @@
 
                         <div class="mb-3">
                             <label class="form-label">Import <span class="text-danger">*</span></label>
-                            <input type="file" id="fileImport" class="form-control" accept=".xls,.xlsx,.csv" required>
+                            <input type="file" id="fileImport" class="form-control" accept=".xls,.xlsx,.csv"
+                                required>
                         </div>
 
                         <div class="d-flex justify-content-end gap-2 mt-3">
@@ -180,6 +198,14 @@
                     {
                         data: 'nik2',
                         name: 'nik2',
+                    },
+                    {
+                        data: 'cardnodevice1',
+                        name: 'cardnodevice1'
+                    },
+                    {
+                        data: 'cardnodevice2',
+                        name: 'cardnodevice2'
                     },
                     {
                         data: 'nama',
@@ -238,6 +264,8 @@
                         nik: $('#nik').val(),
                         departemen: $('#departemen').val(),
                         nik2: $('#nik2').val(),
+                        cardnodevice1: $('#cardnodevice1').val(),
+                        cardnodevice2: $('#cardnodevice2').val(),
                         _token: "{{ csrf_token() }}"
                     },
                     success: function() {

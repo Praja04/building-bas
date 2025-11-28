@@ -71,6 +71,14 @@
                      <span class="menu-text">Peserta</span>
                  </a>
              </li>
+
+             <li class="side-nav-item">
+                 <a href="{{ route('msid.index') }}"
+                     class="side-nav-link {{ request()->routeIs('msid.index') ? 'active' : '' }}">
+                     <span class="menu-icon"><i data-lucide="id-card"></i></span>
+                     <span class="menu-text">MSID</span>
+                 </a>
+             </li>
              {{-- todo: kegiatan --}}
              {{-- <li class="side-nav-item">
                  <a href="{{ route('kegiatan.index') }}"

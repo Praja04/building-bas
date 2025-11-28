@@ -33,7 +33,17 @@ class ParticipantController extends Controller
                         ? $row->nik2
                         : '<span class="text-center">-</span>';
                 })
-                ->rawColumns(['nik2'])
+                ->editColumn('cardnodevice1', function ($row) {
+                    return $row->cardnodevice1
+                        ? $row->cardnodevice1
+                        : '<span class="text-center">-</span>';
+                })
+                ->editColumn('cardnodevice2', function ($row) {
+                    return $row->cardnodevice2
+                        ? $row->cardnodevice2
+                        : '<span class="text-center">-</span>';
+                })
+                ->rawColumns(['nik2', 'cardnodevice1', 'cardnodevice2'])
                 ->make(true);
         }
 
@@ -58,9 +68,13 @@ class ParticipantController extends Controller
             'nama' => 'required',
             'departemen' => 'required',
             'nik2' => 'nullable|unique:participants,nik2',
+            'cardnodevice1' => 'nullable|unique:participants,cardnodevice1',
+            'cardnodevice2' => 'nullable|unique:participants,cardnodevice2',
         ], [
             'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
             'nik2.unique' => 'NIK 2 sudah terdaftar, gunakan NIK 2 lain.',
+            'cardnodevice1.unique' => 'Card No. Device 1 sudah terdaftar, gunakan Card No. Device 1 lain.',
+            'cardnodevice2.unique' => 'Card No. Device 2 sudah terdaftar, gunakan Card No. Device 2 lain.',
         ]);
 
         try {
@@ -69,6 +83,8 @@ class ParticipantController extends Controller
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
                 'nik2'   => $request->nik2,
+                'cardnodevice1' => $request->cardnodevice1,
+                'cardnodevice2' => $request->cardnodevice2,
             ]);
 
             return response()->json([
@@ -118,9 +134,13 @@ class ParticipantController extends Controller
             'nama' => 'required',
             'departemen' => 'required',
             'nik2' => 'nullable|unique:participants,nik2,' . $id . ',id',
+            'cardnodevice1' => 'nullable|unique:participants,cardnodevice1,' . $id . ',id',
+            'cardnodevice2' => 'nullable|unique:participants,cardnodevice2,' . $id . ',id',
         ], [
             'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
             'nik2.unique' => 'NIK 2 sudah terdaftar, gunakan NIK 2 lain.',
+            'cardnodevice1.unique' => 'Card No. Device 1 sudah terdaftar, gunakan Card No. Device 1 lain.',
+            'cardnodevice2.unique' => 'Card No. Device 2 sudah terdaftar, gunakan Card No. Device 2 lain.',
         ]);
 
         try {
@@ -138,6 +158,8 @@ class ParticipantController extends Controller
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
                 'nik2' => $request->nik2,
+                'cardnodevice1' => $request->cardnodevice1,
+                'cardnodevice2' => $request->cardnodevice2,
             ]);
 
             return response()->json([
