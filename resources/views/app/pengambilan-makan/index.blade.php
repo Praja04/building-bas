@@ -227,7 +227,7 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Pengambilan Ditolak!',
+                                    title: 'Sudah Ambil!',
                                     html: `
                                             <div class="text-start">
                                                 <strong>${res.data.nama}</strong><br>
@@ -265,7 +265,7 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Pengambilan Ditolak!',
+                                    title: 'Gagal!',
                                     text: "Anda belum melakukan registrasi, tidak dapat mengambil makan!",
                                     customClass: {
                                         popup: 'text-white',
@@ -294,7 +294,7 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Pengambilan Ditolak!',
+                                    title: 'Gagal!',
                                     text: "Anda tidak terdaftar sebagai peserta!",
                                     customClass: {
                                         popup: 'text-white',

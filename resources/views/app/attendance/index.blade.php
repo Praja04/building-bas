@@ -276,7 +276,7 @@
                                             icon: 'error',
                                             background: "#dc3545",
                                             color: '#ffffff',
-                                            title: 'Registrasi Ditolak!',
+                                            title: 'Gagal!',
                                             text: 'Anda tidak terdaftar sebagai peserta',
                                             customClass: {
                                                 popup: 'text-white',

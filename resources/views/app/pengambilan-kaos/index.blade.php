@@ -227,7 +227,7 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Pengambilan Ditolak!',
+                                    title: 'Sudah Ambil!',
                                     html: `
                                         <div cLlass="text-start">
                                             <strong>${res.data.nama}</strong><br>
@@ -278,7 +278,7 @@
                                     icon: 'error',
                                     background: "#dc3545",
                                     color: '#ffffff',
-                                    title: 'Pengambilan Ditolak!',
+                                    title: 'Gagal!',
                                     text: "Anda tidak terdaftar sebagai peserta",
                                     customClass: {
                                         popup: 'text-white',
