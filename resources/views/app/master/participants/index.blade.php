@@ -1,6 +1,7 @@
 @extends('layouts.component.main')
 @section('title', 'Data Peserta')
 @section('content')
+
     <div class="container-fluid">
         <div class="page-title-head d-flex align-items-center mb-0 pb-0">
             <div class="flex-grow-1">
@@ -41,6 +42,7 @@
                                 </th>
                                 <th>No.</th>
                                 <th>NIK</th>
+                                <th>NIK 2</th>
                                 <th>Nama Peserta</th>
                                 <th>Departemen</th>
                                 <th>Aksi</th>
@@ -73,6 +75,11 @@
                         <div class="mb-3">
                             <label class="form-label">NIK <span class="text-danger">*</span></label>
                             <input type="text" id="nik" class="form-control" required placeholder="NIK">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">NIK 2 <span class="text-danger">*</span></label>
+                            <input type="text" id="nik2" class="form-control" required placeholder="NIK 2">
                         </div>
 
                         <div class="mb-3">
@@ -171,6 +178,10 @@
                         name: 'nik',
                     },
                     {
+                        data: 'nik2',
+                        name: 'nik2',
+                    },
+                    {
                         data: 'nama',
                         name: 'nama'
                     },
@@ -226,6 +237,7 @@
                         nama: $('#nama').val(),
                         nik: $('#nik').val(),
                         departemen: $('#departemen').val(),
+                        nik2: $('#nik2').val(),
                         _token: "{{ csrf_token() }}"
                     },
                     success: function() {
@@ -245,7 +257,8 @@
                         let msg = "Terjadi kesalahan saat menyimpan peserta";
 
                         if (xhr.status === 422) {
-                            msg = 'NIK sudah terdaftar, gunakan NIK lain';
+                            let errors = xhr.responseJSON.errors;
+                            msg = Object.values(errors)[0][0];
                         } else if (xhr.status === 404) {
                             msg = 'Peserta tidak ditemukan atau sudah dihapus';
                         }
@@ -278,6 +291,7 @@
                         $('#nama').val(res.nama);
                         $('#nik').val(res.nik);
                         $('#departemen').val(res.departemen);
+                        $('#nik2').val(res.nik2);
                         modalPeserta.show();
                     },
                     error: function(xhr) {

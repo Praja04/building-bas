@@ -28,6 +28,12 @@ class ParticipantController extends Controller
 
             return DataTables::of($participants)
                 ->addIndexColumn()
+                ->editColumn('nik2', function ($row) {
+                    return $row->nik2
+                        ? $row->nik2
+                        : '<span class="text-center">-</span>';
+                })
+                ->rawColumns(['nik2'])
                 ->make(true);
         }
 
@@ -51,8 +57,10 @@ class ParticipantController extends Controller
             'nik' => 'required|unique:participants,nik',
             'nama' => 'required',
             'departemen' => 'required',
+            'nik2' => 'nullable|unique:participants,nik2',
         ], [
-            'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.'
+            'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
+            'nik2.unique' => 'NIK 2 sudah terdaftar, gunakan NIK 2 lain.',
         ]);
 
         try {
@@ -60,6 +68,7 @@ class ParticipantController extends Controller
                 'nik'   => $request->nik,
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
+                'nik2'   => $request->nik2,
             ]);
 
             return response()->json([
@@ -108,8 +117,10 @@ class ParticipantController extends Controller
             'nik' => 'required|unique:participants,nik,' . $id . ',id',
             'nama' => 'required',
             'departemen' => 'required',
+            'nik2' => 'nullable|unique:participants,nik2,' . $id . ',id',
         ], [
-            'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.'
+            'nik.unique' => 'NIK sudah terdaftar, gunakan NIK lain.',
+            'nik2.unique' => 'NIK 2 sudah terdaftar, gunakan NIK 2 lain.',
         ]);
 
         try {
@@ -126,6 +137,7 @@ class ParticipantController extends Controller
                 'nik'   => $request->nik,
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
+                'nik2' => $request->nik2,
             ]);
 
             return response()->json([
