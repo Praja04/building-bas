@@ -374,8 +374,7 @@ class ParticipantController extends Controller
         foreach ($nikList as $nik) {
 
             // 1. Cari NIK normal
-            $data = DB::connection('192.168.178.44-admin')
-                ->table('MSIDCARD')
+            $data = DB::table('msidcard')
                 ->select(
                     'NIK as nik',
                     'EMPNM as nama',
@@ -387,8 +386,7 @@ class ParticipantController extends Controller
 
             // 2. Jika tidak ada dan nik TIDAK punya leading zero → coba tambah 0
             if (!$data && !str_starts_with($nik, '0')) {
-                $data = DB::connection('192.168.178.44-admin')
-                    ->table('MSIDCARD')
+                $data = DB::table('msidcard')
                     ->select(
                         'NIK as nik',
                         'EMPNM as nama',

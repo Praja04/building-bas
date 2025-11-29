@@ -41,22 +41,20 @@ class PengambilanKaosController extends Controller
     {
         try {
             // 1️. CARI BERDASARKAN CARDNODEVICE
-            $data = DB::connection('192.168.178.44-admin')
-                ->table('MSIDCARD')
+            $data = DB::table('msidcard')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 ->where('CARDNODEVICE', $input)
                 ->where('STATUS', 'X') // active
-                ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
+                ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC') // ambil yang terbaru
                 ->first();
 
             // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK 
             if (!$data) {
-                $data = DB::connection('192.168.178.44-admin')
-                    ->table('MSIDCARD')
+                $data = DB::table('msidcard')
                     ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
                     ->where('STATUS', 'X') // active
-                    ->orderBy('CREATEDON', 'DESC') // ambil yang terbaru
+                    ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC') // ambil yang terbaru
                     ->first();
 
                 // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan

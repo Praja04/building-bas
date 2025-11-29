@@ -46,8 +46,7 @@ class PengambilanMakanController extends Controller
             // ========================================
             // LANGKAH 1: Cek di tabel MSIDCARD berdasarkan CARDNODEVICE
             // ========================================
-            $data = DB::connection('192.168.178.44-admin')
-                ->table('MSIDCARD')
+            $data = DB::table('msidcard')
                 ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                 ->where('CARDNODEVICE', $input)
                 ->where('STATUS', 'X') // active
@@ -83,8 +82,7 @@ class PengambilanMakanController extends Controller
             // ========================================
             if (!$data) {
                 // 3a. Cek NIK di tabel MSIDCARD
-                $data = DB::connection('192.168.178.44-admin')
-                    ->table('MSIDCARD')
+                $data = DB::table('msidcard')
                     ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
                     ->where('NIK', $input)
                     ->where('STATUS', 'X') // active
