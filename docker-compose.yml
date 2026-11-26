@@ -1,0 +1,13 @@
+services:
+  building-bas-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: building-bas-app
+    restart: unless-stopped
+    ports:
+      - "8094:80"
+    volumes:
+      - .:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
