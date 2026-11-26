@@ -402,7 +402,7 @@ class ParticipantController extends Controller
         foreach ($nikList as $nik) {
 
             // 1. Cari NIK normal
-            $data = DB::table('msidcard')
+            $data = DB::table('MSIDCARD')
                 ->select(
                     'NIK as nik',
                     'EMPNM as nama',
@@ -414,7 +414,7 @@ class ParticipantController extends Controller
 
             // 2. Jika tidak ada dan nik TIDAK punya leading zero → coba tambah 0
             if (!$data && !str_starts_with($nik, '0')) {
-                $data = DB::table('msidcard')
+                $data = DB::table('MSIDCARD')
                     ->select(
                         'NIK as nik',
                         'EMPNM as nama',

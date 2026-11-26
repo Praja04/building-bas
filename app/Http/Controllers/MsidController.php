@@ -11,7 +11,7 @@ class MsidController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = DB::table('msidcard')
+            $data = DB::table('MSIDCARD')
                 ->select(
                     'NIK as nik',
                     'EMPNM as nama',
@@ -41,7 +41,7 @@ class MsidController extends Controller
     public function edit($id)
     {
         try {
-            $data = DB::table('msidcard')
+            $data = DB::table('MSIDCARD')
                 ->select(
                     'NIK as nik',
                     'EMPNM as nama',
@@ -78,7 +78,7 @@ class MsidController extends Controller
                 'departemen.required' => 'Departemen wajib diisi.',
             ]);
 
-            DB::table('msidcard')
+            DB::table('MSIDCARD')
                 ->where('EMPCARDID', $id)
                 ->update([
                     'NIK' => $request->nik,
