@@ -10,8 +10,8 @@ services:
       - ./.env
     volumes:
       - ./:/var/www/html
-    networks:
-      - mybas-net
+    depends_on:
+      - mysql
     ports:
       - "8094:80"
 
@@ -30,10 +30,19 @@ services:
       - ./:/var/www/html
     depends_on:
       - app
-    networks:
-      - mybas-net
+      - mysql
 
-networks:
-  mybas-net:
-    external: true
-    name: mybas-online_mybas-net
+  mysql:
+    image: mysql:8.0
+    container_name: building-bas-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123
+      MYSQL_DATABASE: idcard
+    volumes:
+      - building-bas-db-data:/var/lib/mysql
+    ports:
+      - "3308:3306"
+
+volumes:
+  building-bas-db-data:
