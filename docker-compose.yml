@@ -1,13 +1,36 @@
 services:
-  building-bas-app:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
+    image: building-bas-app:latest
     container_name: building-bas-app
     restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - mybas-net
     ports:
       - "8094:80"
+
+  queue:
+    image: building-bas-app:latest
+    container_name: building-bas-worker
+    restart: unless-stopped
+    command: |
+      sh -c 'trap "kill 0" SIGTERM SIGINT EXIT; \
+        php artisan queue:work database --tries=3 --timeout=90 --sleep=1 & \
+        wait'
     volumes:
-      - .:/var/www/html
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ./:/var/www/html
+    depends_on:
+      - app
+    networks:
+      - mybas-net
+
+networks:
+  mybas-net:
+    external: true
+    name: mybas-online_mybas-net
