@@ -16,6 +16,9 @@ services:
       - "8094:80"
 
   queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: building-bas-app:latest
     container_name: building-bas-worker
     restart: unless-stopped
