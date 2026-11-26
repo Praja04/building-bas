@@ -15,13 +15,20 @@ class ParticipantsImport implements ToModel, WithHeadingRow
      */
     public function model(array $row)
     {
-        $nik        = trim($row['nik'] ?? '');
-        $nama       = trim($row['nama'] ?? '');
-        $departemen = trim($row['departemen'] ?? '');
+        $participant_id = trim((string)($row['participant_id'] ?? $row['id_participant'] ?? $row['id_peserta'] ?? ''));
+        $nik            = trim((string)($row['nik'] ?? ''));
+        $nama           = trim((string)($row['nama_karyawan'] ?? $row['nama_pegawai'] ?? $row['nama_peserta'] ?? $row['nama'] ?? ''));
+        $departemen     = trim((string)($row['departemen'] ?? $row['department'] ?? ''));
+        $ukuran_baju    = trim((string)($row['ukuran_baju'] ?? $row['ukuran'] ?? ''));
 
         // skip kalau rownya kosong
         if ($nik === '' && $nama === '' && $departemen === '') {
             return null;
+        }
+
+        // jika NIK kosong (misal data cadangan/spare), buat NIK placeholder agar tetap bisa masuk
+        if ($nik === '' && $nama !== '') {
+            $nik = 'SPARE-' . strtoupper(substr(md5($nama . microtime(true)), 0, 8));
         }
 
         // ada data required yang kosong
@@ -56,9 +63,11 @@ class ParticipantsImport implements ToModel, WithHeadingRow
         }
 
         return new Participant([
-            'nik'        => $nik,
-            'nama'       => $nama,
-            'departemen' => $departemen,
+            'participant_id' => $participant_id !== '' ? $participant_id : null,
+            'nik'            => $nik,
+            'nama'           => $nama,
+            'departemen'     => $departemen,
+            'ukuran_baju'    => $ukuran_baju !== '' ? $ukuran_baju : null,
         ]);
     }
 }

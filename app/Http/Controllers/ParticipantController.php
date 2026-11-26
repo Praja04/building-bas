@@ -28,9 +28,19 @@ class ParticipantController extends Controller
 
             return DataTables::of($participants)
                 ->addIndexColumn()
+                ->editColumn('participant_id', function ($row) {
+                    return $row->participant_id
+                        ? '<span class="fw-semibold">' . e($row->participant_id) . '</span>'
+                        : '<span class="text-center text-muted">-</span>';
+                })
                 ->editColumn('nik2', function ($row) {
                     return $row->nik2
                         ? $row->nik2
+                        : '<span class="text-center">-</span>';
+                })
+                ->editColumn('ukuran_baju', function ($row) {
+                    return $row->ukuran_baju
+                        ? '<span class="badge bg-secondary">' . e($row->ukuran_baju) . '</span>'
                         : '<span class="text-center">-</span>';
                 })
                 ->editColumn('cardnodevice1', function ($row) {
@@ -43,7 +53,7 @@ class ParticipantController extends Controller
                         ? $row->cardnodevice2
                         : '<span class="text-center">-</span>';
                 })
-                ->rawColumns(['nik2', 'cardnodevice1', 'cardnodevice2'])
+                ->rawColumns(['participant_id', 'nik2', 'ukuran_baju', 'cardnodevice1', 'cardnodevice2'])
                 ->make(true);
         }
 
@@ -64,9 +74,11 @@ class ParticipantController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'participant_id' => 'nullable|string|max:50',
             'nik' => 'required|unique:participants,nik',
             'nama' => 'required',
             'departemen' => 'required',
+            'ukuran_baju' => 'nullable|string|max:20',
             'nik2' => 'nullable|unique:participants,nik2',
             'cardnodevice1' => 'nullable|unique:participants,cardnodevice1',
             'cardnodevice2' => 'nullable|unique:participants,cardnodevice2',
@@ -79,9 +91,11 @@ class ParticipantController extends Controller
 
         try {
             Participant::create([
+                'participant_id' => $request->participant_id,
                 'nik'   => $request->nik,
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
+                'ukuran_baju' => $request->ukuran_baju,
                 'nik2'   => $request->nik2,
                 'cardnodevice1' => $request->cardnodevice1,
                 'cardnodevice2' => $request->cardnodevice2,
@@ -130,9 +144,11 @@ class ParticipantController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'participant_id' => 'nullable|string|max:50',
             'nik' => 'required|unique:participants,nik,' . $id . ',id',
             'nama' => 'required',
             'departemen' => 'required',
+            'ukuran_baju' => 'nullable|string|max:20',
             'nik2' => 'nullable|unique:participants,nik2,' . $id . ',id',
             'cardnodevice1' => 'nullable|unique:participants,cardnodevice1,' . $id . ',id',
             'cardnodevice2' => 'nullable|unique:participants,cardnodevice2,' . $id . ',id',
@@ -154,9 +170,11 @@ class ParticipantController extends Controller
             }
 
             $participant->update([
+                'participant_id' => $request->participant_id,
                 'nik'   => $request->nik,
                 'nama'      => $request->nama,
                 'departemen' => $request->departemen,
+                'ukuran_baju' => $request->ukuran_baju,
                 'nik2' => $request->nik2,
                 'cardnodevice1' => $request->cardnodevice1,
                 'cardnodevice2' => $request->cardnodevice2,
@@ -238,15 +256,25 @@ class ParticipantController extends Controller
         try {
             // cek header
             $firstSheet =  Excel::toArray([], $request->file('file'));
-            $headings = array_map('strtolower', $firstSheet[0][0]);
+            $headings = array_map(function($h) {
+                return strtolower(str_replace([' ', '_', '.'], '', (string)$h));
+            }, $firstSheet[0][0]);
+
             $required = ['nik', 'nama', 'departemen'];
 
             foreach ($required as $col) {
-                if (!in_array($col, $headings)) {
+                $matched = false;
+                foreach ($headings as $h) {
+                    if (str_contains($h, $col)) {
+                        $matched = true;
+                        break;
+                    }
+                }
+                if (!$matched) {
                     return response()->json([
                         'status' => 'error',
                         'error'   => 'InvalidTemplate',
-                        'message' => "Format file tidak sesuai. Mohon gunakan template import yang sudah disediakan.",
+                        'message' => "Format file tidak sesuai. Kolom '{$col}' tidak ditemukan.",
                     ], 422);
                 }
             }

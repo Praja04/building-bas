@@ -21,7 +21,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
      */
     public function collection()
     {
-        return Participant::select('nik', 'nama', 'departemen')
+        return Participant::select('participant_id', 'nik', 'nama', 'departemen', 'ukuran_baju')
             ->orderBy('nama', 'asc')
             ->get();
     }
@@ -31,7 +31,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
      */
     public function headings(): array
     {
-        return ["No", "NIK", "Nama Karyawan", "Departemen"];
+        return ["No", "ID Participant", "NIK", "Nama Karyawan", "Departemen", "Ukuran Baju"];
     }
 
     /**
@@ -43,9 +43,11 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
 
         return [
             $this->rowNumber,
+            $data->participant_id ?? "-",
             $data->nik,
             $data->nama,
             $data->departemen,
+            $data->ukuran_baju ?? "-",
         ];
     }
 
@@ -56,9 +58,11 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
     {
         return [
             'A' => 6,   // No
-            'B' => 15,  // NIK
-            'C' => 30,  // Nama Pegawai
-            'D' => 15,  // Departemen
+            'B' => 18,  // ID Participant
+            'C' => 15,  // NIK
+            'D' => 30,  // Nama Pegawai
+            'E' => 15,  // Departemen
+            'F' => 15,  // Ukuran Baju
         ];
     }
 
@@ -70,7 +74,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
         $rowCount = $sheet->getHighestRow();
 
         // Style untuk header (baris 1)
-        $sheet->getStyle('A1:D1')->applyFromArray([
+        $sheet->getStyle('A1:F1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -93,7 +97,7 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
         ]);
 
         // Style untuk semua data (termasuk border)
-        $sheet->getStyle('A1:D' . $rowCount)->applyFromArray([
+        $sheet->getStyle('A1:F' . $rowCount)->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -108,7 +112,9 @@ class ParticipantExport implements FromCollection, WithHeadings, WithMapping, Wi
         // Alignment center
         $sheet->getStyle('A2:A' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2:B' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('D2:D' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('C2:C' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('E2:E' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('F2:F' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         return [];
     }

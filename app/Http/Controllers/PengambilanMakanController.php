@@ -41,36 +41,24 @@ class PengambilanMakanController extends Controller
     public function getByCard($input)
     {
         try {
-            $data = null;
+            $pesertaFromFallback = null;
 
             // ========================================
             // LANGKAH 1: Cek di tabel MSIDCARD berdasarkan CARDNODEVICE
             // ========================================
-            $data = DB::table('msidcard')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
-                ->where('CARDNODEVICE', $input)
-                ->where('STATUS', 'X') // active
-                ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
-                ->first();
+            $data = $this->findActiveMsidcard('CARDNODEVICE', $input, true);
 
             // ========================================
-            // LANGKAH 2: Jika tidak ditemukan, cek di tabel participants berdasarkan CARDNODEVICE
+            // LANGKAH 2: Jika tidak ditemukan, cek di tabel participants berdasarkan CARDNODEVICE / NIK
             // ========================================
             if (!$data) {
-                // Cek cardnodevice1 terlebih dahulu
-                $peserta = Participant::where('cardnodevice1', $input)->first();
+                $pesertaFromFallback = $this->findParticipantByCardOrNik($input);
 
-                // Jika tidak ada, cek cardnodevice2
-                if (!$peserta) {
-                    $peserta = Participant::where('cardnodevice2', $input)->first();
-                }
-
-                // Jika ditemukan, format data
-                if ($peserta) {
+                if ($pesertaFromFallback) {
                     $data = (object)[
-                        'nik'          => $peserta->nik,
-                        'nama'         => $peserta->nama,
-                        'departemen'   => $peserta->departemen,
+                        'nik'          => $pesertaFromFallback->nik,
+                        'nama'         => $pesertaFromFallback->nama,
+                        'departemen'   => $pesertaFromFallback->departemen,
                         'cardnodevice' => $input,
                         'foto'         => null
                     ];
@@ -81,31 +69,17 @@ class PengambilanMakanController extends Controller
             // LANGKAH 3: Jika masih tidak ditemukan, cek berdasarkan NIK
             // ========================================
             if (!$data) {
-                // 3a. Cek NIK di tabel MSIDCARD
-                $data = DB::table('msidcard')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
-                    ->where('NIK', $input)
-                    ->where('STATUS', 'X') // active
-                    ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
-                    ->first();
+                $data = $this->findActiveMsidcard('NIK', $input, true);
 
-                // 3b. Jika tidak ada, cek NIK dan NIK2 di tabel participants
-                if (!$data) {
-                    // Cek NIK terlebih dahulu
-                    $peserta = Participant::where('nik', $input)->first();
+                if (!$data && !$pesertaFromFallback) {
+                    $pesertaFromFallback = $this->findParticipantByCardOrNik($input);
 
-                    // Jika tidak ada, cek NIK2
-                    if (!$peserta) {
-                        $peserta = Participant::where('nik2', $input)->first();
-                    }
-
-                    // Jika ditemukan, format data
-                    if ($peserta) {
+                    if ($pesertaFromFallback) {
                         $data = (object)[
-                            'nik'          => $peserta->nik,
-                            'nama'         => $peserta->nama,
-                            'departemen'   => $peserta->departemen,
-                            'cardnodevice' => $peserta->cardnodevice1 ?? $peserta->cardnodevice2,
+                            'nik'          => $pesertaFromFallback->nik,
+                            'nama'         => $pesertaFromFallback->nama,
+                            'departemen'   => $pesertaFromFallback->departemen,
+                            'cardnodevice' => $pesertaFromFallback->cardnodevice1 ?? $pesertaFromFallback->cardnodevice2,
                             'foto'         => null
                         ];
                     }
@@ -126,9 +100,7 @@ class PengambilanMakanController extends Controller
             // ========================================
             // CEK APAKAH TERDAFTAR SEBAGAI PESERTA
             // ========================================
-            $peserta = Participant::where('nik', $data->nik)
-                ->orWhere('nik2', $data->nik)
-                ->first();
+            $peserta = $pesertaFromFallback ?? $this->findParticipantByNik($data->nik);
 
             if (!$peserta) {
                 return response()->json([
@@ -144,11 +116,17 @@ class PengambilanMakanController extends Controller
                 ], 403);
             }
 
+            $todayStart = Carbon::today()->startOfDay();
+            $todayEnd = Carbon::today()->endOfDay();
+
+            // Kumpulkan semua varian NIK peserta yang sah
+            $nikList = $this->getParticipantNikVariants($peserta, $data->nik);
+
             // ========================================
             // VALIDASI KEHADIRAN (HARUS SUDAH ADA DI TABEL ATTENDANCE)
             // ========================================
-            $isRegist = Attendance::where('nik', $data->nik)
-                ->whereDate('jam_masuk', Carbon::today())
+            $isRegist = Attendance::whereIn('nik', $nikList)
+                ->whereBetween('jam_masuk', [$todayStart, $todayEnd])
                 ->first();
 
             if (!$isRegist) {
@@ -168,12 +146,12 @@ class PengambilanMakanController extends Controller
             // ========================================
             // VALIDASI PENGAMBILAN (hanya boleh 1 kali)
             // ========================================
-            $today = Carbon::today();
-            $pengambilanHariIni = PengambilanMakan::where(function ($query) use ($input, $data) {
-                $query->where('cardnodevice', $input)
-                    ->orWhere('nik', $data->nik);
-            })
-                ->whereDate('waktu_ambil', $today)
+            $pengambilanHariIni = PengambilanMakan::whereIn('nik', $nikList)
+                ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
+                ->orderBy('waktu_ambil', 'desc')
+                ->first()
+                ?? PengambilanMakan::where('cardnodevice', $input)
+                ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();
 
@@ -196,35 +174,13 @@ class PengambilanMakanController extends Controller
                 ], 403);
             }
 
-            // Hitung total pengambilan (untuk memastikan tidak lebih dari 1)
-            $totalPengambilanHariIni = PengambilanMakan::where(function ($query) use ($input, $data) {
-                $query->where('cardnodevice', $input)
-                    ->orWhere('nik', $data->nik);
-            })
-                ->whereDate('waktu_ambil', $today)
-                ->count();
-
-            // Double check: jika ada data (meskipun query pertama null)
-            if ($totalPengambilanHariIni > 0) {
-                return response()->json([
-                    'status' => 'rejected',
-                    'error_code' => 'SUDAH_AMBIL',
-                    'message' => 'Anda sudah mencapai batas pengambilan makan hari ini!',
-                    'data' => [
-                        'nik' => $data->nik,
-                        'nama' => $data->nama,
-                        'total_pengambilan' => $totalPengambilanHariIni,
-                        'foto' => $this->convertBlobToBase64($data->foto)
-                    ]
-                ], 403);
-            }
-
             // ========================================
             // SIMPAN DATA PENGAMBILAN MAKAN (First time today)
             // ========================================
+            // Gunakan $peserta->nik yang valid di tabel participants agar foreign key constraint tidak gagal
             $pengambilan = PengambilanMakan::create([
                 'cardnodevice' => $data->cardnodevice ?? "0",
-                'nik' => $data->nik,
+                'nik' => $peserta->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
                 'waktu_ambil' => now(),
@@ -233,7 +189,7 @@ class PengambilanMakanController extends Controller
 
             // Log untuk audit
             Log::info('Pengambilan Makan Berhasil', [
-                'nik' => $data->nik,
+                'nik' => $peserta->nik,
                 'nama' => $data->nama,
                 'waktu' => now()->toDateTimeString()
             ]);
@@ -242,7 +198,7 @@ class PengambilanMakanController extends Controller
                 'status' => 'success',
                 'message' => 'Pengambilan makan berhasil dicatat!',
                 'data' => [
-                    'nik' => $data->nik,
+                    'nik' => $peserta->nik,
                     'nama' => $data->nama,
                     'departemen' => $data->departemen,
                     'waktu_ambil' => $pengambilan->waktu_ambil->format('H:i:s'),
@@ -260,19 +216,6 @@ class PengambilanMakanController extends Controller
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
             ], 500);
-        }
-    }
-
-    private function convertBlobToBase64($blob)
-    {
-        if (!$blob) {
-            return null;
-        }
-
-        if (is_resource($blob)) {
-            return 'data:image/jpeg;base64,' . base64_encode(stream_get_contents($blob));
-        } else {
-            return 'data:image/jpeg;base64,' . base64_encode($blob);
         }
     }
 

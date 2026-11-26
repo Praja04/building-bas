@@ -22,16 +22,16 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
      */
     public function collection()
     {
-        // get data yang statusnya sudah diambil 
-        // return PengambilanKaos::select('nik', 'nama_pegawai', 'departemen', 'waktu_ambil', 'status')
-        //     ->get();
-
-        // get all participants data
+        // get all participants data with pengambilan_kaos
         return Participant::select(
-            'participants.id as participant_id',
+            'participants.id as participant_id_pk',
+            'participants.participant_id as participant_code',
+            'pengambilan_kaos.participant_id as pengambilan_participant_id',
             'participants.nik',
             'participants.nama',
             'participants.departemen',
+            'participants.ukuran_baju as ukuran_baju_peserta',
+            'pengambilan_kaos.ukuran_baju as ukuran_baju_ambil',
             'pengambilan_kaos.waktu_ambil',
             'pengambilan_kaos.status'
         )
@@ -45,7 +45,7 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
      */
     public function headings(): array
     {
-        return ["No", "NIK", "Nama Karyawan", "Departemen", "Waktu Ambil", "Status"];
+        return ["No", "ID Participant", "NIK", "Nama Karyawan", "Departemen", "Ukuran Baju", "Waktu Ambil", "Status"];
     }
 
     /**
@@ -57,9 +57,11 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
 
         return [
             $this->rowNumber,
+            $data->pengambilan_participant_id ?? $data->participant_code ?? "-",
             $data->nik,
-            $data->nama_pegawai ?? $data->nama, // nama_pegawai dari table pengambilan_kaos, nama dari table participants
+            $data->nama_pegawai ?? $data->nama,
             $data->departemen,
+            $data->ukuran_baju_ambil ?? $data->ukuran_baju_peserta ?? "-",
             $data->waktu_ambil ?? "-",
             $data->status === "sudah_diambil"
                 ? "Sudah Diambil"
@@ -74,11 +76,13 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
     {
         return [
             'A' => 6,   // No
-            'B' => 15,  // NIK
-            'C' => 30,  // Nama Pegawai
-            'D' => 15,  // Departemen
-            'E' => 25,  // Waktu Ambil
-            'F' => 25,  // Status
+            'B' => 18,  // ID Participant
+            'C' => 15,  // NIK
+            'D' => 30,  // Nama Pegawai
+            'E' => 15,  // Departemen
+            'F' => 15,  // Ukuran Baju
+            'G' => 25,  // Waktu Ambil
+            'H' => 25,  // Status
         ];
     }
 
@@ -90,7 +94,7 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
         $rowCount = $sheet->getHighestRow();
 
         // Style untuk header (baris 1)
-        $sheet->getStyle('A1:F1')->applyFromArray([
+        $sheet->getStyle('A1:H1')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'size' => 12,
@@ -113,7 +117,7 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
         ]);
 
         // Style untuk semua data (termasuk border)
-        $sheet->getStyle('A1:F' . $rowCount)->applyFromArray([
+        $sheet->getStyle('A1:H' . $rowCount)->applyFromArray([
             'borders' => [
                 'allBorders' => [
                     'borderStyle' => Border::BORDER_THIN,
@@ -128,9 +132,11 @@ class PengambilanKaosExport implements FromCollection, WithHeadings, WithMapping
         // Alignment center
         $sheet->getStyle('A2:A' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('B2:B' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet->getStyle('D2:D' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('C2:C' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('E2:E' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         $sheet->getStyle('F2:F' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('G2:G' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle('H2:H' . $rowCount)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
         return [];
     }

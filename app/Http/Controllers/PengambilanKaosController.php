@@ -20,6 +20,16 @@ class PengambilanKaosController extends Controller
             $query = PengambilanKaos::query()->orderBy('created_at', 'desc');
             return DataTables::of($query)
                 ->addIndexColumn()
+                ->editColumn('participant_id', function ($row) {
+                    return $row->participant_id
+                        ? '<span class="fw-semibold">' . e($row->participant_id) . '</span>'
+                        : '<span class="text-muted">-</span>';
+                })
+                ->editColumn('ukuran_baju', function ($row) {
+                    return $row->ukuran_baju
+                        ? '<span class="badge bg-primary fs-6 px-2 py-1">' . e($row->ukuran_baju) . '</span>'
+                        : '<span class="text-muted">-</span>';
+                })
                 ->addColumn('status_badge', function ($row) {
                     if ($row->status == 'belum_diambil') {
                         return '<span class="badge bg-warning text-dark">Belum Diambil</span>';
@@ -30,7 +40,7 @@ class PengambilanKaosController extends Controller
                 ->addColumn('waktu_ambil_formatted', function ($row) {
                     return $row->waktu_ambil ? date('d M Y H:i', strtotime($row->waktu_ambil)) : '-';
                 })
-                ->rawColumns(['status_badge'])
+                ->rawColumns(['participant_id', 'ukuran_baju', 'status_badge'])
                 ->make(true);
         }
 
@@ -40,44 +50,26 @@ class PengambilanKaosController extends Controller
     public function getByCard($input)
     {
         try {
+            $pesertaFromFallback = null;
+
             // 1️. CARI BERDASARKAN CARDNODEVICE
-            $data = DB::table('msidcard')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
-                ->where('CARDNODEVICE', $input)
-                ->where('STATUS', 'X') // active
-                ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC') // ambil yang terbaru
-                ->first();
+            $data = $this->findActiveMsidcard('CARDNODEVICE', $input, true);
 
             // 2️. JIKA TIDAK DITEMUKAN, CARI BERDASARKAN NIK 
             if (!$data) {
-                $data = DB::table('msidcard')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
-                    ->where('NIK', $input)
-                    ->where('STATUS', 'X') // active
-                    ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC') // ambil yang terbaru
-                    ->first();
-
-                // Jika tidak ketemu dan input TIDAK diawali angka 0 → coba tambah 0 di depan
-                // if (!$data && !str_starts_with($input, '0')) {
-
-                //     $data = DB::connection('192.168.178.44-admin')
-                //         ->table('MSIDCARD')
-                //         ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice', 'FOTOBLOB as foto')
-                //         ->where('NIK', '0' . $input)
-                //         ->first();
-                // }
+                $data = $this->findActiveMsidcard('NIK', $input, true);
             }
 
             // last option: cari di table participants
             // note: untuk PT PAS akan cari data di sini
             if (!$data) {
-                $peserta = Participant::where('nik', $input)->first();
+                $pesertaFromFallback = $this->findParticipantByCardOrNik($input);
 
-                if ($peserta) {
+                if ($pesertaFromFallback) {
                     $data = (object)[
-                        'nik'        => $peserta->nik,
-                        'nama'       => $peserta->nama,
-                        'departemen' => $peserta->departemen,
+                        'nik'        => $pesertaFromFallback->nik,
+                        'nama'       => $pesertaFromFallback->nama,
+                        'departemen' => $pesertaFromFallback->departemen,
                         'foto'       => null
                     ];
                 }
@@ -92,8 +84,8 @@ class PengambilanKaosController extends Controller
                 ], 404);
             }
 
-            // Cek apakah peserta terdaftar di tabel participants
-            $peserta = Participant::where('nik', $data->nik)->first();
+            // Cek apakah peserta terdaftar di tabel participants (cek nik & nik2 beserta leading zero)
+            $peserta = $pesertaFromFallback ?? $this->findParticipantByNik($data->nik);
 
             if (!$peserta) {
                 return response()->json([
@@ -109,8 +101,12 @@ class PengambilanKaosController extends Controller
                 ], 403);
             }
 
+            // Kumpulkan semua varian NIK peserta yang sah (nik, nik2, dan varian leading-0) untuk validasi riwayat
+            $nikList = $this->getParticipantNikVariants($peserta, $data->nik);
+
             // VALIDASI PENGAMBILAN HANYA 1 KALI
-            $pengambilanSebelumnya = PengambilanKaos::where('cardnodevice', $input)->orWhere('nik', $data->nik)->first();
+            $pengambilanSebelumnya = PengambilanKaos::whereIn('nik', $nikList)->first()
+                ?? PengambilanKaos::where('cardnodevice', $input)->first();
 
             // Jika sudah pernah ambil, TOLAK
             if ($pengambilanSebelumnya) {
@@ -121,9 +117,11 @@ class PengambilanKaosController extends Controller
                     'error_code' => 'SUDAH_AMBIL',
                     'message' => 'Anda telah mengambil kaos sebelumnya.',
                     'data' => [
+                        'participant_id' => $pengambilanSebelumnya->participant_id ?? $peserta->participant_id ?? '-',
                         'nik' => $data->nik,
                         'nama' => $data->nama,
                         'departemen' => $data->departemen,
+                        'ukuran_baju' => $pengambilanSebelumnya->ukuran_baju ?? $peserta->ukuran_baju ?? '-',
                         'waktu_ambil_sebelumnya' => $waktuAmbil,
                         'jumlah_pengambilan' => 1,
                         'foto' => $this->convertBlobToBase64($data->foto)
@@ -132,11 +130,14 @@ class PengambilanKaosController extends Controller
             }
 
             // SIMPAN DATA PENGAMBILAN KAOS (First time today)
+            // Gunakan $peserta->nik yang valid di tabel participants agar foreign key constraint tidak gagal
             $pengambilan = PengambilanKaos::create([
+                'participant_id' => $peserta->participant_id ?? null,
                 'cardnodevice' => $data->cardnodevice ?? '0',
-                'nik' => $data->nik,
+                'nik' => $peserta->nik,
                 'nama_pegawai' => $data->nama,
                 'departemen' => $data->departemen,
+                'ukuran_baju' => $peserta->ukuran_baju ?? null,
                 'waktu_ambil' => now(),
                 'status' => 'sudah_diambil',
             ]);
@@ -145,9 +146,11 @@ class PengambilanKaosController extends Controller
                 'status' => 'success',
                 'message' => 'Pengambilan kaos berhasil dicatat!',
                 'data' => [
-                    'nik' => $data->nik,
+                    'participant_id' => $peserta->participant_id ?? '-',
+                    'nik' => $peserta->nik,
                     'nama' => $data->nama,
                     'departemen' => $data->departemen,
+                    'ukuran_baju' => $peserta->ukuran_baju ?? '-',
                     'waktu_ambil' => $pengambilan->waktu_ambil->format('H:i:s'),
                     'tanggal' => $pengambilan->waktu_ambil->format('d/m/Y'),
                     'foto' => $this->convertBlobToBase64($data->foto)
@@ -158,19 +161,6 @@ class PengambilanKaosController extends Controller
                 'status' => 'error',
                 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
             ], 500);
-        }
-    }
-
-    private function convertBlobToBase64($blob)
-    {
-        if (!$blob) {
-            return null;
-        }
-
-        if (is_resource($blob)) {
-            return 'data:image/jpeg;base64,' . base64_encode(stream_get_contents($blob));
-        } else {
-            return 'data:image/jpeg;base64,' . base64_encode($blob);
         }
     }
 

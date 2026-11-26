@@ -41,12 +41,14 @@
                                     <input type="checkbox" id="checkAll">
                                 </th>
                                 <th>No.</th>
+                                <th>ID Participant</th>
                                 <th>NIK</th>
                                 <th>NIK 2</th>
                                 <th>Card No. Device 1</th>
                                 <th>Card No. Device 2</th>
                                 <th>Nama Peserta</th>
                                 <th>Departemen</th>
+                                <th>Ukuran Baju</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -75,6 +77,11 @@
                         <input type="hidden" id="peserta_id">
 
                         <div class="row g-3">
+                            <div class="col-lg-6">
+                                <label class="form-label">ID Participant</label>
+                                <input type="text" id="participant_id" class="form-control" placeholder="ID Participant">
+                            </div>
+
                             <div class="col-lg-6">
                                 <label class="form-label">NIK <span class="text-danger">*</span></label>
                                 <input type="text" id="nik" class="form-control" required placeholder="NIK">
@@ -107,6 +114,21 @@
                                 <label class="form-label">Departemen <span class="text-danger">*</span></label>
                                 <input type="text" id="departemen" class="form-control" required
                                     placeholder="Departemen">
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label">Ukuran Baju</label>
+                                <select id="ukuran_baju" class="form-select">
+                                    <option value="">-- Pilih Ukuran Baju --</option>
+                                    <option value="S">S</option>
+                                    <option value="M">M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                    <option value="XXL">XXL</option>
+                                    <option value="3XL">3XL</option>
+                                    <option value="4XL">4XL</option>
+                                    <option value="5XL">5XL</option>
+                                </select>
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
@@ -196,6 +218,10 @@
                         searchable: false,
                     },
                     {
+                        data: 'participant_id',
+                        name: 'participant_id',
+                    },
+                    {
                         data: 'nik',
                         name: 'nik',
                     },
@@ -218,6 +244,10 @@
                     {
                         data: 'departemen',
                         name: 'departemen'
+                    },
+                    {
+                        data: 'ukuran_baju',
+                        name: 'ukuran_baju'
                     },
                     {
                         data: null,
@@ -264,9 +294,11 @@
                     url: url,
                     type: method,
                     data: {
+                        participant_id: $('#participant_id').val(),
                         nama: $('#nama').val(),
                         nik: $('#nik').val(),
                         departemen: $('#departemen').val(),
+                        ukuran_baju: $('#ukuran_baju').val(),
                         nik2: $('#nik2').val(),
                         cardnodevice1: $('#cardnodevice1').val(),
                         cardnodevice2: $('#cardnodevice2').val(),
@@ -320,9 +352,11 @@
                     success: function(res) {
                         $('#modalTitlePeserta').text('Edit Peserta');
                         $('#peserta_id').val(res.id);
+                        $('#participant_id').val(res.participant_id || '');
                         $('#nama').val(res.nama);
                         $('#nik').val(res.nik);
                         $('#departemen').val(res.departemen);
+                        $('#ukuran_baju').val(res.ukuran_baju || '');
                         $('#nik2').val(res.nik2);
                         $('#cardnodevice1').val(res.cardnodevice1);
                         $('#cardnodevice2').val(res.cardnodevice2);

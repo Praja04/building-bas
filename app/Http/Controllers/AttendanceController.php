@@ -57,70 +57,42 @@ class AttendanceController extends Controller
     public function getUser($input)
     {
         try {
-            $data = null;
-
             // ========================================
             // LANGKAH 1: Cek di tabel MSIDCARD berdasarkan CARDNODEVICE
             // ========================================
-            $data = DB::table('msidcard')
-                ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
-                ->where('CARDNODEVICE', $input)
-                ->where('STATUS', 'X') // active
-                ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
-                ->first();
+            $data = $this->findActiveMsidcard('CARDNODEVICE', $input);
 
             // ========================================
-            // LANGKAH 2: Jika tidak ditemukan, cek di tabel participants berdasarkan CARDNODEVICE
+            // LANGKAH 2: Jika tidak ditemukan, cek di tabel participants berdasarkan CARDNODEVICE / NIK
             // ========================================
             if (!$data) {
-                // Cek cardnodevice1 terlebih dahulu
-                $peserta = Participant::where('cardnodevice1', $input)->first();
+                $peserta = $this->findParticipantByCardOrNik($input);
 
-                // Jika tidak ada, cek cardnodevice2
-                if (!$peserta) {
-                    $peserta = Participant::where('cardnodevice2', $input)->first();
-                }
-
-                // Jika ditemukan, format data
                 if ($peserta) {
                     $data = (object)[
-                        'nik'        => $peserta->nik,
-                        'nama'       => $peserta->nama,
-                        'departemen' => $peserta->departemen,
-                        'cardnodevice' => $input // cardnodevice yang digunakan
+                        'nik'          => $peserta->nik,
+                        'nama'         => $peserta->nama,
+                        'departemen'   => $peserta->departemen,
+                        'cardnodevice' => $input,
                     ];
                 }
             }
 
             // ========================================
-            // LANGKAH 3: Jika masih tidak ditemukan, cek berdasarkan NIK
+            // LANGKAH 3: Jika masih tidak ditemukan, cek berdasarkan NIK di MSIDCARD
             // ========================================
             if (!$data) {
-                // 3a. Cek NIK di tabel MSIDCARD
-                $data = DB::table('msidcard')
-                    ->select('NIK as nik', 'EMPNM as nama', 'DEPTID as departemen', 'CARDNODEVICE as cardnodevice')
-                    ->where('NIK', $input)
-                    ->where('STATUS', 'X') // active
-                    ->orderByRaw('CAST(CHANGEDON AS SIGNED) DESC')
-                    ->first();
+                $data = $this->findActiveMsidcard('NIK', $input);
 
-                // 3b. Jika tidak ada, cek NIK dan NIK2 di tabel participants
                 if (!$data) {
-                    // Cek NIK terlebih dahulu
-                    $peserta = Participant::where('nik', $input)->first();
+                    $peserta = $this->findParticipantByCardOrNik($input);
 
-                    // Jika tidak ada, cek NIK2
-                    if (!$peserta) {
-                        $peserta = Participant::where('nik2', $input)->first();
-                    }
-
-                    // Jika ditemukan, format data
                     if ($peserta) {
                         $data = (object)[
-                            'nik'        => $peserta->nik,
-                            'nama'       => $peserta->nama,
-                            'departemen' => $peserta->departemen,
-                            'cardnodevice' => $peserta->cardnodevice1 ?? $peserta->cardnodevice2 // ambil cardnodevice yang tersedia
+                            'nik'          => $peserta->nik,
+                            'nama'         => $peserta->nama,
+                            'departemen'   => $peserta->departemen,
+                            'cardnodevice' => $peserta->cardnodevice1 ?? $peserta->cardnodevice2,
                         ];
                     }
                 }
@@ -134,6 +106,14 @@ class AttendanceController extends Controller
                     'status' => 'error',
                     'message' => 'Data karyawan tidak ditemukan.'
                 ], 404);
+            }
+
+            // Sinkronkan data dengan tabel participants (agar NIK resmi peserta digunakan)
+            $peserta = $this->findParticipantByNik($data->nik);
+            if ($peserta) {
+                $data->nik = $peserta->nik;
+                $data->nama = $peserta->nama;
+                $data->departemen = $peserta->departemen;
             }
 
             return response()->json([
@@ -164,7 +144,7 @@ class AttendanceController extends Controller
                 'is_doorprize' => 'nullable|boolean',
             ]);
 
-            $peserta = Participant::where('nik', $request->nik)->first();
+            $peserta = $this->findParticipantByNik($request->nik);
 
             if (!$peserta) {
                 return response()->json([
@@ -173,8 +153,13 @@ class AttendanceController extends Controller
                 ], 404);
             }
 
-            $existing = Attendance::whereDate('jam_masuk', now()->toDateString())
-                ->where('nik', $request->nik)
+            $todayStart = Carbon::today()->startOfDay();
+            $todayEnd = Carbon::today()->endOfDay();
+
+            $nikList = $this->getParticipantNikVariants($peserta, $request->nik);
+
+            $existing = Attendance::whereIn('nik', $nikList)
+                ->whereBetween('jam_masuk', [$todayStart, $todayEnd])
                 ->first();
 
             if ($existing) {
@@ -191,9 +176,9 @@ class AttendanceController extends Controller
 
             $eligibleForDoorprize = $isLate ? false : true;
 
-            $peserta = Attendance::create([
+            $pesertaRecord = Attendance::create([
                 'cardnodevice' => $request->cardnodevice,
-                'nik'          => $request->nik,
+                'nik'          => $peserta->nik,
                 'nama_pegawai' => $request->nama_pegawai,
                 'departemen'   => $request->departemen,
                 'jam_masuk'    => $jamMasuk,
@@ -204,10 +189,10 @@ class AttendanceController extends Controller
                 'status' => 'success',
                 'message' => 'Berhasil registrasi!',
                 'data' => [
-                    'nik' => $peserta->nik,
-                    'nama_pegawai' => $peserta->nama_pegawai,
-                    'departemen' => $peserta->departemen,
-                    'jam_masuk_formatted'    => Carbon::parse($peserta->jam_masuk)->format('d M Y H:i'),
+                    'nik' => $pesertaRecord->nik,
+                    'nama_pegawai' => $pesertaRecord->nama_pegawai,
+                    'departemen' => $pesertaRecord->departemen,
+                    'jam_masuk_formatted'    => Carbon::parse($pesertaRecord->jam_masuk)->format('d M Y H:i'),
                 ]
             ], 200);
         } catch (\Exception $e) {
@@ -223,18 +208,22 @@ class AttendanceController extends Controller
                 'nik' => 'required|string',
             ]);
 
-            $peserta = Attendance::where('nik', $request->nik)
-                ->whereDate('jam_masuk', now()->toDateString())
+            $peserta = $this->findParticipantByNik($request->nik);
+
+            $nikList = $this->getParticipantNikVariants($peserta, $request->nik);
+
+            $attendance = Attendance::whereIn('nik', $nikList)
+                ->whereBetween('jam_masuk', [Carbon::today()->startOfDay(), Carbon::today()->endOfDay()])
                 ->first();
 
-            if (!$peserta) {
+            if (!$attendance) {
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'Peserta belum registrasi masuk'
                 ], 404);
             }
 
-            if ($peserta->jam_keluar !== null) {
+            if ($attendance->jam_keluar !== null) {
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'Peserta sudah melakukan checkout sebelumnya.'
@@ -242,7 +231,7 @@ class AttendanceController extends Controller
             }
 
             $jamKeluar = now();
-            $jamMasuk = Carbon::parse($peserta->jam_masuk);
+            $jamMasuk = Carbon::parse($attendance->jam_masuk);
 
             $batasMasuk = Carbon::today()->setTime(8, 0, 0);
             $batasKeluar = Carbon::today()->setTime(14, 0, 0);
@@ -258,7 +247,7 @@ class AttendanceController extends Controller
                 $statusDoorprize = true;
             }
 
-            $peserta->update([
+            $attendance->update([
                 'jam_keluar'   => $jamKeluar,
                 'is_doorprize' => $statusDoorprize
             ]);
@@ -267,10 +256,10 @@ class AttendanceController extends Controller
                 'status'  => 'success',
                 'message' => 'Checkout berhasil!',
                 'data' => [
-                    'nik' => $peserta->nik,
-                    'nama_pegawai' => $peserta->nama_pegawai,
-                    'departemen' => $peserta->departemen,
-                    'jam_keluar_formatted'    => Carbon::parse($peserta->jam_keluar)->format('d M Y H:i'),
+                    'nik' => $attendance->nik,
+                    'nama_pegawai' => $attendance->nama_pegawai,
+                    'departemen' => $attendance->departemen,
+                    'jam_keluar_formatted'    => Carbon::parse($attendance->jam_keluar)->format('d M Y H:i'),
                 ]
             ]);
         } catch (\Exception $e) {

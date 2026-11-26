@@ -43,6 +43,12 @@ Route::prefix('pengambilan-kaos')->group(function () {
    Route::get('/export', [App\Http\Controllers\PengambilanKaosController::class, 'export'])->name('pengambilan-kaos.export');
 });
 
+Route::prefix('pengambilan-eskrim')->group(function () {
+   Route::get('/', [App\Http\Controllers\PengambilanEskrimController::class, 'index'])->name('pengambilan-eskrim.index');
+   Route::get('/get-by-card/{cardnodevice}', [App\Http\Controllers\PengambilanEskrimController::class, 'getByCard'])->name('pengambilan-eskrim.getByCard');
+   Route::get('/export', [App\Http\Controllers\PengambilanEskrimController::class, 'export'])->name('pengambilan-eskrim.export');
+});
+
 Route::prefix('master')->group(function () {
 
    Route::prefix('participants')->group(function () {

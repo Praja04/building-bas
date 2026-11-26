@@ -69,6 +69,15 @@
                                             </div>
                                         </div>
 
+                                        <!-- ID Participant -->
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold">
+                                                ID Participant
+                                            </label>
+                                            <input type="text" class="form-control" name="participant_id" id="participant_id"
+                                                placeholder="-" readonly>
+                                        </div>
+
                                         <!-- NIK -->
                                         <div class="col-md-12">
                                             <label class="form-label fw-semibold">
@@ -95,6 +104,18 @@
                                             <input type="text" class="form-control" name="departemen" id="departemen"
                                                 required readonly>
                                         </div>
+
+                                        <!-- Ukuran Baju -->
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold">
+                                                Ukuran Baju
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control fw-bold text-primary fs-5" name="ukuran_baju" id="ukuran_baju"
+                                                    placeholder="-" readonly>
+                                                <span class="input-group-text bg-primary text-white"><i class="ti ti-shirt"></i></span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -118,10 +139,11 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th width="5%">#</th>
-                                        {{-- <th>ID Card</th> --}}
+                                        <th>ID Participant</th>
                                         <th>NIK</th>
                                         <th>Nama</th>
                                         <th>Departemen</th>
+                                        <th>Ukuran Baju</th>
                                         <th>Waktu Ambil</th>
                                         <th width="10%">Status</th>
                                     </tr>
@@ -149,7 +171,7 @@
         }
 
         $('#btnResetRFID').on('click', function() {
-            $('#cardnodevice, #nik, #nama_pegawai, #departemen').val('');
+            $('#cardnodevice, #participant_id, #nik, #nama_pegawai, #departemen, #ukuran_baju').val('');
             $('#fotoPegawai').attr('src', "{{ asset('assets/images/no-image.jpg') }}");
             $('#cardnodevice').focus();
         });
@@ -171,9 +193,11 @@
                             if (res.status === 'success') {
                                 playSound("{{ asset('assets/sound/success.mp3') }}");
 
+                                $('#participant_id').val(res.data.participant_id || '-');
                                 $('#nik').val(res.data.nik);
                                 $('#nama_pegawai').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen);
+                                $('#ukuran_baju').val(res.data.ukuran_baju || '-');
 
                                 if (res.data.foto) {
                                     $('#fotoPegawai').attr('src', res.data.foto);
@@ -190,7 +214,8 @@
                                     html: `
                                 <div class="text-start">
                                     <strong>${res.data.nama}</strong><br>
-                                    <small>${res.data.nik} - ${res.data.departemen}</small><br>
+                                    <small>${res.data.participant_id && res.data.participant_id !== '-' ? res.data.participant_id + ' | ' : ''}${res.data.nik} - ${res.data.departemen}</small><br>
+                                    <div class="mt-1"><span class="badge bg-warning text-dark fs-6">Ukuran: ${res.data.ukuran_baju || '-'}</span></div>
                                     <small>Tanggal: ${res.data.tanggal} | Waktu: ${res.data.waktu_ambil} WIB</small>
                                 </div>
                             `,
@@ -215,9 +240,11 @@
                                 // ❌ DITOLAK - Sudah ambil hari ini
                                 playSound("{{ asset('assets/sound/failed.mp3') }}");
 
+                                $('#participant_id').val(res.data.participant_id || '-');
                                 $('#nik').val(res.data.nik);
                                 $('#nama_pegawai').val(res.data.nama);
                                 $('#departemen').val(res.data.departemen || '');
+                                $('#ukuran_baju').val(res.data.ukuran_baju || '-');
 
                                 if (res.data.foto) {
                                     $('#fotoPegawai').attr('src', res.data.foto);
@@ -229,9 +256,10 @@
                                     color: '#ffffff',
                                     title: 'Sudah Ambil!',
                                     html: `
-                                        <div cLlass="text-start">
+                                        <div class="text-start">
                                             <strong>${res.data.nama}</strong><br>
-                                            <small>${res.data.nik}</small><br>
+                                            <small>${res.data.participant_id && res.data.participant_id !== '-' ? res.data.participant_id + ' | ' : ''}${res.data.nik}</small><br>
+                                            <div class="mt-1"><span class="badge bg-warning text-dark">Ukuran: ${res.data.ukuran_baju || '-'}</span></div>
                                             <hr class="my-1">
                                             <small><strong>${res.message}</strong></small><br>
                                             <small>Waktu: ${res.data.waktu_ambil_sebelumnya} WIB</small><br>
@@ -344,10 +372,10 @@
                         orderable: false,
                         searchable: false
                     },
-                    // {
-                    //     data: 'cardnodevice',
-                    //     name: 'cardnodevice'
-                    // },
+                    {
+                        data: 'participant_id',
+                        name: 'participant_id'
+                    },
                     {
                         data: 'nik',
                         name: 'nik'
@@ -359,6 +387,10 @@
                     {
                         data: 'departemen',
                         name: 'departemen'
+                    },
+                    {
+                        data: 'ukuran_baju',
+                        name: 'ukuran_baju'
                     },
                     {
                         data: 'waktu_ambil_formatted',
