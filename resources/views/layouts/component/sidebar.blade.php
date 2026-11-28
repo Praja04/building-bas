@@ -70,6 +70,14 @@
                  </a>
              </li>
 
+             <li class="side-nav-item">
+                 <a href="{{ route('doorprize.index') }}"
+                     class="side-nav-link {{ request()->routeIs('doorprize.index') ? 'active' : '' }}">
+                     <span class="menu-icon"><i data-lucide="gift"></i></span>
+                     <span class="menu-text">Undian Doorprize</span>
+                 </a>
+             </li>
+
              {{-- Master Data --}}
              <li class="side-nav-title mt-2">Master Data</li>
              <li class="side-nav-item">

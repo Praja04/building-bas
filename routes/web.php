@@ -49,6 +49,16 @@ Route::prefix('pengambilan-eskrim')->group(function () {
    Route::get('/export', [App\Http\Controllers\PengambilanEskrimController::class, 'export'])->name('pengambilan-eskrim.export');
 });
 
+Route::prefix('doorprize')->group(function () {
+   Route::get('/', [App\Http\Controllers\DoorprizeController::class, 'index'])->name('doorprize.index');
+   Route::get('/data', [App\Http\Controllers\DoorprizeController::class, 'getData'])->name('doorprize.data');
+   Route::post('/draw', [App\Http\Controllers\DoorprizeController::class, 'draw'])->name('doorprize.draw');
+   Route::post('/winners', [App\Http\Controllers\DoorprizeController::class, 'storeWinner'])->name('doorprize.storeWinner');
+   Route::delete('/winners/{id}', [App\Http\Controllers\DoorprizeController::class, 'destroyWinner'])->name('doorprize.destroyWinner');
+   Route::post('/reset', [App\Http\Controllers\DoorprizeController::class, 'resetWinners'])->name('doorprize.reset');
+   Route::get('/export', [App\Http\Controllers\DoorprizeController::class, 'export'])->name('doorprize.export');
+});
+
 Route::prefix('master')->group(function () {
 
    Route::prefix('participants')->group(function () {
