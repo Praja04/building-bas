@@ -146,11 +146,12 @@ class PengambilanMakanController extends Controller
             // ========================================
             // VALIDASI PENGAMBILAN (hanya boleh 1 kali)
             // ========================================
+            $cardCandidates = $this->normalizeNumericCandidates($input);
             $pengambilanHariIni = PengambilanMakan::whereIn('nik', $nikList)
                 ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
                 ->orderBy('waktu_ambil', 'desc')
                 ->first()
-                ?? PengambilanMakan::where('cardnodevice', $input)
+                ?? PengambilanMakan::whereIn('cardnodevice', $cardCandidates)
                 ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();

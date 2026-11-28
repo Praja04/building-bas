@@ -105,8 +105,9 @@ class PengambilanKaosController extends Controller
             $nikList = $this->getParticipantNikVariants($peserta, $data->nik);
 
             // VALIDASI PENGAMBILAN HANYA 1 KALI
+            $cardCandidates = $this->normalizeNumericCandidates($input);
             $pengambilanSebelumnya = PengambilanKaos::whereIn('nik', $nikList)->first()
-                ?? PengambilanKaos::where('cardnodevice', $input)->first();
+                ?? PengambilanKaos::whereIn('cardnodevice', $cardCandidates)->first();
 
             // Jika sudah pernah ambil, TOLAK
             if ($pengambilanSebelumnya) {

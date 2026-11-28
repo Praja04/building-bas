@@ -7,21 +7,41 @@ use Illuminate\Support\Facades\DB;
 abstract class Controller
 {
     /**
+     * Generate candidate variations for NIK or Card Number (stripped leading zero, with 0, and 8/9/10-digit padding).
+     */
+    protected function normalizeNumericCandidates(?string $value): array
+    {
+        if (!$value) {
+            return [];
+        }
+
+        $raw = trim($value);
+        $candidates = [$raw];
+
+        if (is_numeric($raw)) {
+            $stripped = ltrim($raw, '0');
+            if ($stripped !== '') {
+                $candidates[] = $stripped;
+                $candidates[] = '0' . $stripped;
+                $candidates[] = str_pad($stripped, 8, '0', STR_PAD_LEFT);
+                $candidates[] = str_pad($stripped, 9, '0', STR_PAD_LEFT);
+                $candidates[] = str_pad($stripped, 10, '0', STR_PAD_LEFT);
+            }
+        }
+
+        return array_values(array_unique(array_filter($candidates, fn($v) => $v !== '')));
+    }
+
+    /**
      * Look up an active record in msidcard by the given indexed column.
      * Fetches metadata first so sorting never touches off-page FOTOBLOB data,
      * then retrieves FOTOBLOB by primary key only for the winning row.
      */
     protected function findActiveMsidcard(string $column, string $value, bool $withFoto = false): ?object
     {
-        $values = [$value];
-        if ($column === 'NIK') {
-            $trimmed = ltrim($value, '0');
-            $withZero = '0' . $trimmed;
-            if ($trimmed !== '') {
-                $values[] = $trimmed;
-            }
-            $values[] = $withZero;
-            $values = array_values(array_unique($values));
+        $values = $this->normalizeNumericCandidates($value);
+        if (empty($values)) {
+            return null;
         }
 
         $row = DB::table('msidcard')
@@ -37,6 +57,25 @@ abstract class Controller
             ->where('STATUS', 'X')
             ->orderByDesc('CHANGEDON')
             ->first();
+
+        if (!$row && is_numeric($value)) {
+            $stripped = ltrim(trim($value), '0');
+            if ($stripped !== '') {
+                $row = DB::table('msidcard')
+                    ->select(
+                        'EMPCARDID',
+                        'BARCODE',
+                        'NIK as nik',
+                        'EMPNM as nama',
+                        'DEPTID as departemen',
+                        'CARDNODEVICE as cardnodevice'
+                    )
+                    ->whereRaw("TRIM(LEADING '0' FROM {$column}) = ?", [$stripped])
+                    ->where('STATUS', 'X')
+                    ->orderByDesc('CHANGEDON')
+                    ->first();
+            }
+        }
 
         if (!$row) {
             return null;
@@ -63,13 +102,11 @@ abstract class Controller
             return null;
         }
 
-        $raw = trim($nik);
-        $trimmed = ltrim($raw, '0');
+        $variants = $this->normalizeNumericCandidates($nik);
+        $trimmed = ltrim(trim($nik), '0');
         if ($trimmed === '') {
             $trimmed = '0';
         }
-
-        $variants = array_values(array_filter(array_unique([$raw, $trimmed, '0' . $trimmed]), fn($v) => $v !== ''));
 
         // 1. Coba exact match / standard variants terlebih dahulu (cepat & menggunakan index B-Tree)
         $peserta = \App\Models\Participant::where(function ($query) use ($variants) {
@@ -93,13 +130,30 @@ abstract class Controller
      */
     protected function findParticipantByCardOrNik(string $input): ?\App\Models\Participant
     {
-        // 1. Cek cardnodevice1 / cardnodevice2
-        $peserta = \App\Models\Participant::where('cardnodevice1', $input)
-            ->orWhere('cardnodevice2', $input)
-            ->first();
+        $candidates = $this->normalizeNumericCandidates($input);
+
+        // 1. Cek cardnodevice1 / cardnodevice2 dengan variasi leading zero
+        $peserta = \App\Models\Participant::where(function ($query) use ($candidates) {
+            $query->whereIn('cardnodevice1', $candidates)
+                ->orWhereIn('cardnodevice2', $candidates);
+        })->first();
 
         if ($peserta) {
             return $peserta;
+        }
+
+        if (is_numeric($input)) {
+            $stripped = ltrim(trim($input), '0');
+            if ($stripped !== '') {
+                $peserta = \App\Models\Participant::where(function ($query) use ($stripped) {
+                    $query->whereRaw("TRIM(LEADING '0' FROM cardnodevice1) = ?", [$stripped])
+                        ->orWhereRaw("TRIM(LEADING '0' FROM cardnodevice2) = ?", [$stripped]);
+                })->first();
+
+                if ($peserta) {
+                    return $peserta;
+                }
+            }
         }
 
         // 2. Cek NIK / NIK2 dengan fleksibilitas leading zero

@@ -145,11 +145,12 @@ class PengambilanEskrimController extends Controller
             // ========================================
             // VALIDASI PENGAMBILAN (hanya boleh 1 kali)
             // ========================================
+            $cardCandidates = $this->normalizeNumericCandidates($input);
             $pengambilanHariIni = PengambilanEskrim::whereIn('nik', $nikList)
                 ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
                 ->orderBy('waktu_ambil', 'desc')
                 ->first()
-                ?? PengambilanEskrim::where('cardnodevice', $input)
+                ?? PengambilanEskrim::whereIn('cardnodevice', $cardCandidates)
                 ->whereBetween('waktu_ambil', [$todayStart, $todayEnd])
                 ->orderBy('waktu_ambil', 'desc')
                 ->first();
