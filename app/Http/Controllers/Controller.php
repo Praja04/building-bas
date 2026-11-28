@@ -24,7 +24,7 @@ abstract class Controller
             $values = array_values(array_unique($values));
         }
 
-        $row = DB::table('MSIDCARD')
+        $row = DB::table('msidcard')
             ->select(
                 'EMPCARDID',
                 'BARCODE',
@@ -43,7 +43,7 @@ abstract class Controller
         }
 
         if ($withFoto) {
-            $row->foto = DB::table('MSIDCARD')
+            $row->foto = DB::table('msidcard')
                 ->where('EMPCARDID', $row->EMPCARDID)
                 ->where('BARCODE', $row->BARCODE)
                 ->value('FOTOBLOB');

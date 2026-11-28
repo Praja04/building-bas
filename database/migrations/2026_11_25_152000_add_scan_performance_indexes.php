@@ -12,17 +12,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $targetTable = Schema::hasTable('MSIDCARD') ? 'MSIDCARD' : (Schema::hasTable('msidcard') ? 'msidcard' : null);
-
-        if ($targetTable) {
-            $existing = DB::select("SHOW INDEX FROM `{$targetTable}` WHERE Key_name = 'IDXCARDNODEVICE'");
+        if (Schema::hasTable('msidcard')) {
+            $existing = DB::select("SHOW INDEX FROM `msidcard` WHERE Key_name = 'IDXCARDNODEVICE'");
             if (empty($existing)) {
-                DB::statement("ALTER TABLE `{$targetTable}` ADD INDEX `IDXCARDNODEVICE` (`CARDNODEVICE`, `STATUS`, `CHANGEDON`) USING BTREE");
+                DB::statement('ALTER TABLE `msidcard` ADD INDEX `IDXCARDNODEVICE` (`CARDNODEVICE`, `STATUS`, `CHANGEDON`) USING BTREE');
             }
 
-            $existingNikStatus = DB::select("SHOW INDEX FROM `{$targetTable}` WHERE Key_name = 'IDXNIK_STATUS_CHANGEDON'");
+            $existingNikStatus = DB::select("SHOW INDEX FROM `msidcard` WHERE Key_name = 'IDXNIK_STATUS_CHANGEDON'");
             if (empty($existingNikStatus)) {
-                DB::statement("ALTER TABLE `{$targetTable}` ADD INDEX `IDXNIK_STATUS_CHANGEDON` (`NIK`, `STATUS`, `CHANGEDON`) USING BTREE");
+                DB::statement('ALTER TABLE `msidcard` ADD INDEX `IDXNIK_STATUS_CHANGEDON` (`NIK`, `STATUS`, `CHANGEDON`) USING BTREE');
             }
         }
 
@@ -51,17 +49,15 @@ return new class extends Migration
      */
     public function down(): void
     {
-        $targetTable = Schema::hasTable('MSIDCARD') ? 'MSIDCARD' : (Schema::hasTable('msidcard') ? 'msidcard' : null);
-
-        if ($targetTable) {
-            $existing = DB::select("SHOW INDEX FROM `{$targetTable}` WHERE Key_name = 'IDXCARDNODEVICE'");
+        if (Schema::hasTable('msidcard')) {
+            $existing = DB::select("SHOW INDEX FROM `msidcard` WHERE Key_name = 'IDXCARDNODEVICE'");
             if (!empty($existing)) {
-                DB::statement("ALTER TABLE `{$targetTable}` DROP INDEX `IDXCARDNODEVICE`");
+                DB::statement('ALTER TABLE `msidcard` DROP INDEX `IDXCARDNODEVICE`');
             }
 
-            $existingNikStatus = DB::select("SHOW INDEX FROM `{$targetTable}` WHERE Key_name = 'IDXNIK_STATUS_CHANGEDON'");
+            $existingNikStatus = DB::select("SHOW INDEX FROM `msidcard` WHERE Key_name = 'IDXNIK_STATUS_CHANGEDON'");
             if (!empty($existingNikStatus)) {
-                DB::statement("ALTER TABLE `{$targetTable}` DROP INDEX `IDXNIK_STATUS_CHANGEDON`");
+                DB::statement('ALTER TABLE `msidcard` DROP INDEX `IDXNIK_STATUS_CHANGEDON`');
             }
         }
 
